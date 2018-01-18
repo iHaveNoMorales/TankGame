@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+	<style>
+		canvas {
+			border:1px solid black;
+			float:left;
+		}
+	</style>
+  </head>
+  <body>
+	<canvas width="900" height="500" id="can"></canvas>
+	<input type="range" id="input">
+	<script>
+		var px = 200;
+		var py = 200;
+		var canvas = document.getElementById("can");
+		var cx = canvas.getContext("2d");
+		var prot = 0;
+		var pspeed = 5;
+		
+		var vax = [200, 300, 200, 100];
+		var vay = [100, 200, 300, 200];
+		var vbxNO = [20, 80, 300, 20];
+		var vbyNO = [20, 20, 300, 80];
+		var form = 'v';
+		var enemyForm = true;
+		var grav = 0.01;
+		
+		var shells = [];
+		
+		var w = new Wall(100, 100, 50, 150);
+		
+		var w7 = new Wall(300, 100, 50, 150);
+		
+		var gameObjects = [];
+		var enemyBase = new Image();
+		var enemyCannon = new Image();
+		var explosion = new Image();
+		var numTanks = 7; 
+		
+		enemyBase.src = 'RedBase.png';
+		enemyCannon.src = 'RedCannon.png';
+		explosion.src = 'explosion.png';
+		var tanks = [];
+		//tanks.push(new Tank(500, 300));
+		//tanks.push(new Tank(00, 300));
+		for(k = 0; k < numTanks; k++){
+			tanks.push(new Tank(800/(k+1), 400, k));
+		}
+
+		//alert(collisionConvexPolygon(vax, vay, vbxNO, vbyNO ) );
+
+		function collisionConvexPolygon ( vertsax, vertsay, vertsbx, vertsby ) {
+			var alen = vertsax.length;
+			var blen = vertsbx.length;
+			// Loop for axes in Shape A
+			for ( var i = 0, j = alen - 1; i < alen; j = i++ ) {
+				// Get the axis
+				var vx =    vertsax[ j ] - vertsax[ i ];
+				var vy = -( vertsay[ j ] - vertsay[ i ] );
+				var len = Math.sqrt( vx * vx + vy * vy );
+
+				vx /= len;
+				vy /= len;
+
+				// Project shape A
+				var max0 = vertsax[ 0 ] * vx + vertsay[ 0 ] * vy, min0 = max0;
+				for ( k = 1; k < alen; k++ ) {
+					var proja = vertsax[ k ] * vx + vertsay[ k ] * vy;
+
+					if ( proja > max0 ) {
+						max0 = proja;
+					}
+					else if ( proja < min0 ) {
+						min0 = proja;
+					}
+				}
+				// Project shape B
+				var max1 = vertsbx[ 0 ] * vx + vertsby[ 0 ] * vy, min1 = max1;
+				for ( var k = 1; k < blen; k++ ) {
+					var projb = vertsbx[ k ] * vx + vertsby[ k ] * vy;
+
+					if ( projb > max1 ) {
+						max1 = projb;
+					}
+					else if ( projb < min1 ) {
+						min1 = projb;
+					}
+				}
+				// Test for gaps
+				if ( !axisOverlap( min0, max0, min1, max1 ) ) {
+					return false;
+				}
+			}
+			// Loop for axes in Shape B (same as above)
+			for ( var i = 0, j = blen - 1; i < blen; j = i++ ) {
+				var vx =    vertsbx[ j ] - vertsbx[ i ];
+				var vy = -( vertsby[ j ] - vertsby[ i ] );
+				var len = Math.sqrt( vx * vx + vy * vy );
+
+				vx /= len;
+				vy /= len;
+
+				var max0 = vertsax[ 0 ] * vx + vertsay[ 0 ] * vy, min0 = max0;
+				for ( k = 1; k < alen; k++ ) {
+					var proja = vertsax[ k ] * vx + vertsay[ k ] * vy;
+
+					if ( proja > max0 ) {
+						max0 = proja;
+					}
+					else if ( proja < min0 ) {
+						min0 = proja;
+					}
+				}
+				var max1 = vertsbx[ 0 ] * vx + vertsby[ 0 ] * vy, min1 = max1;
+				for ( var k = 1; k < blen; k++ ) {
+					var projb = vertsbx[ k ] * vx + vertsby[ k ] * vy;
+
+					if ( projb > max1 ) {
+						max1 = projb;
+					}
+					else if ( projb < min1 ) {
+						min1 = projb;
+					}
+				}
+				if ( !axisOverlap( min0, max0, min1, max1 ) ) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+
+		function axisOverlap ( a0, a1, b0, b1 ) {
+			return !( a0 > b1 || b0 > a1 );
+		}
+		
+		var keys = {};    
+		window.addEventListener('keydown',function(e){
+			keys[e.keyCode || e.which] = true;
+		},true);    
+		window.addEventListener('keyup',function(e){
+			keys[e.keyCode || e.which] = false;
+		},true);
+
+		function keyControl(){
+			
+			
+			if(keys[87]){
+				py -= Math.cos(prot)*pspeed;
+				px += Math.sin(prot)*pspeed;
+			}
+			if(keys[83]){
+				py += Math.cos(prot)*pspeed;
+				px -= Math.sin(prot)*pspeed;
+			}
+			if(keys[68]){
+				prot+=0.04;
+			}
+			if(keys[65]){
+				prot-=0.04;
+			}
+			
+		}
+		
+		function Tank(x, y, p){
+			this.x = x;
+			this.y = y;
+			this.rot = 0;
+			this.blocked = false;
+			this.speed = 1;
+			this.targ = new Point(px, py);
+			this.tempPath = false;
+			this.pathTimer = 0;
+			this.p = p;
+			this.pathcheckConstant = 30;
+			this.srot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x); //smooth rotation;
+			this.turnVel = 0.04;
+			this.formation = enemyForm;
+			this.shotSpeed = 10;
+			this.reload = 50;
+			this.reloading = this.reload;
+			this.shotTarg = new Point(px, py);
+			
+			this.draw = function(){
+				cx.fillStyle = "black";
+				cx.save();
+				cx.translate(this.x, this.y);
+				if(this.formation && dist(this.x, this.y, this.targ.x, this.targ.y) < 2){
+					cx.rotate(Math.atan2(py-this.y, px-this.x));
+				} else {
+					cx.rotate(this.rot);
+				}
+				cx.rotate(Math.PI/2);
+				cx.drawImage(enemyBase, -25, -25, 50, 50);
+				cx.rotate(-Math.PI/2);
+				cx.restore();
+				cx.save();
+				cx.translate(this.x, this.y);
+				cx.rotate(Math.PI/2);
+				
+				cx.rotate(Math.atan2(py-this.y, px-this.x));
+				cx.drawImage(enemyCannon, -25, -25, 50, 50);
+				cx.rotate(-Math.atan2(py-this.y, px-this.x));
+				cx.rotate(-Math.PI/2);
+				
+				//console.log(this.shotTarg.x+", "+this.shotTarg.y);
+				//cx.fillRect(-25, -25, 50, 50);
+				cx.fillStyle="blue";
+				//cx.fillRect(-25, -25, 25, 50);
+				
+				cx.fillStyle = "rgba(0, 0, 0, 0.1)";
+				cx.fillRect(-25, -25, dist(this.x, this.y, px, py), 50);
+				
+				
+				cx.beginPath();
+				cx.moveTo(0, 0);
+				cx.strokeStyle = 'red';
+				cx.lineTo(50, 0);
+				cx.stroke();
+				cx.closePath();	
+				
+				cx.restore();
+				cx.fillStyle = "black";
+				cx.fillText(this.p, this.x, this.y-20);
+				cx.beginPath();
+				cx.moveTo(this.x, this.y);
+				cx.strokeStyle = 'red';
+				//cx.lineTo(px, py);
+				cx.stroke();
+				cx.closePath();
+				cx.fillRect(this.shotTarg.x, this.shotTarg.y, 15, 15);
+					
+				
+				
+			}
+			
+			this.shoot = function(rota){
+				this.shotTarg = new Point(px, py);
+				d = dist(this.x, this.y, this.shotTarg.x, this.shotTarg.y);
+				
+				
+				if(this.reloading == 0){
+					temps = new Shell(this.x, this.y, Math.cos(rota)*this.shotSpeed, Math.sin(rota)*this.shotSpeed, rota);
+					shells.push(temps);
+					this.reloading = this.reload;
+				}
+				this.reloading--;
+				
+			}
+			
+			
+			this.think = function(){
+				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+				if(!this.formation){
+					this.targ = new Point(px, py);
+				}
+				
+				this.swarm();
+				if(!this.blocked){
+					if(!this.formation){
+						if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
+							this.x += Math.cos(this.rot)*this.speed;
+							this.y += Math.sin(this.rot)*this.speed;
+						}
+					} else {
+						if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
+							this.x += Math.cos(this.rot)*this.speed;
+							this.y += Math.sin(this.rot)*this.speed;
+						}
+					}
+					this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
+					this.tempPath = false;
+				}
+				this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
+				if(this.blocked && !this.tempPath){
+					this.pathFind();
+					
+				}
+				//////console.log(this.blocked+", "+this.tempPath);
+				if(this.tempPath){
+					this.x += Math.cos(this.rot)*this.speed;
+					this.y += Math.sin(this.rot)*this.speed;
+					if(this.pathTimer == 0){
+						this.pathFind();
+					}
+					if(this.pathTimer > 0){
+						this.pathTimer--;
+					}
+				}
+				if(this.rot > this.srot){
+					this.srot+=this.turnVel;
+				}
+				if(this.rot < this.srot){
+					this.srot-=this.turnVel;
+				}
+				if(Math.abs(this.rot-this.srot) < this.turnVel){
+					this.srot = this.rot;
+				}
+				
+				
+				
+				
+					
+				
+			
+			}
+			
+			this.swarm = function(){
+				for (k = 0; k < tanks.length; k++) {
+					t = tanks[k];
+					if(!this.formation){
+						if (k.x != this.x && t.p > this.p && dist(t.x, t.y, this.x, this.y) < 100) {
+							this.x -= Math.cos(this.rot)*this.speed;
+							this.y -= Math.sin(this.rot)*this.speed;
+						}
+					} else {
+						if (k.x != this.x && t.p > this.p && dist(t.x, t.y, this.x, this.y) < 0) {
+							this.x -= Math.cos(this.rot)*this.speed;
+							this.y -= Math.sin(this.rot)*this.speed;
+						}
+					}					
+				}
+			}
+			
+			this.pathFind = function(){
+				tRot = this.rot;
+				degrees = [];
+				//////console.log("1");
+				j = 0;
+				//step 1, check all angles (increment by 5 to save time), if these angles don't result in blocked path add to list
+				while(j < 360){
+					if(!this.checkObj(gameObjects, j*(Math.PI/180))){
+						degrees.push(j*(Math.PI/180));
+					}
+					j+=5;
+				}
+				
+				//setting up step 2, basic minimum search
+				targetr = Math.atan2(this.targ.y-this.y, this.targ.x-this.x); //the goal is to find minimum distance between a degree in degrees and the exact angle from tank to player
+				if(targetr < 0){
+					targetr+=2*Math.PI;
+				}
+				//////console.log(targetr*(180/Math.PI));
+				mind = Math.abs(degrees[0]-targetr); //min distance (in radians)
+				minpos = 0; //position of degree resulting in min distance
+				//////console.log("3");
+				//////console.log(degrees.length);
+				//step 2, loop through degrees and find minimum separation between angle and target angle.
+				for(k = 0; k < degrees.length; k++){
+				
+					if(degrees[k] > targetr+Math.PI){ //passing 180 degrees (PI radians) gets you closer to target, this logic means angles greater than 180 are treated as getting closer
+					//////console.log("yee");
+					//////console.log((180/Math.PI)*degrees[k]+", "+(180/Math.PI)*(degrees[k]-(2*(degrees[k]-Math.PI)))); 
+						if(Math.abs(((degrees[k]-(2*(degrees[k]-Math.PI)))-targetr)) < mind){
+						
+							mind = Math.abs(degrees[k]-targetr);
+							minpos = k;
+						}
+					} else {
+						if(Math.abs(degrees[k]-targetr) < mind){
+							mind = Math.abs(degrees[k]-targetr);
+							minpos = k;
+						}
+					}
+				}
+				//////console.log("4");
+				if(Math.abs(Math.PI-Math.abs(this.rot-degrees[minpos])) < (5*(Math.PI/180))){ //if the angle to pathfind to is close to 180 (resulting from bug), don't do it and attempt to pathfind again
+					this.pathTimer = 5;
+					this.tempPath = true;
+					//////console.log("yee");
+				} else {
+					this.rot = degrees[minpos];
+				}
+				
+				this.pathTimer = this.pathcheckConstant; //resetting countdown
+				this.tempPath = true; //prevents pathfinding from happening every frame
+				//////console.log("5");
+			}
+			
+			this.checkObj = function(objects, rota){
+				for(i = 0; i < objects.length; i++){
+					c = objects[i].coords();
+					
+					if(dist(c[0][0]+(c[0][2]-c[0][0])/2, c[1][0]+(c[1][2]-c[1][0])/2, this.x, this.y) < 500){
+						
+						if (this.detect(c, rota)){
+							return this.detect(c, rota);
+						}
+					}
+					
+				}
+				return false;
+				
+			}
+			
+			this.detect = function(coords, rota){
+				var rotM = [[Math.cos(-rota), Math.sin(-rota)], [-1*Math.sin(-rota), Math.cos(-rota)]];
+				////////console.log(rotM);
+				var m1 = multiply(rotM, [[-25], [-25]]);
+				
+				var m2 = multiply(rotM, [[-25], [25]]);
+				
+				var m3 = multiply(rotM, [[-25+dist(this.x, this.y, px, py)], [0+25]]);
+				
+				var m4 = multiply(rotM, [[-25+dist(this.x, this.y, px, py)], [-25]]);
+				
+				
+				//his.x-25)*Math.cos(this.rot)-((this.y-25)*Math.sin(this.rot))],[(this.x-25)*Math.sin(this.rot)+((this.y-25)*Math.cos(this.rot))]];
+				////////console.log(typeof(m1[0][0]));
+				boxX = [(m1[0][0]+this.x), m2[0][0]+this.x, m3[0][0]+this.x, m4[0][0]+this.x];
+				boxY = [m1[1][0]+this.y, m2[1][0]+this.y, m3[1][0]+this.y, m4[1][0]+this.y];
+				cx.fillStyle = "rgba(0, 0, 255, 0.1)";
+				cx.fillStyle="black";
+				//cx.fillText(""+m1[0][0] + " and " + this.x + "and " + (m1[0] + this.x), 30, 30 );
+				//maunu addition
+				//cx.fillRect(boxX[0], boxY[0], 500, 500);
+				
+			//	cx.fillRect(boxX[0], boxY[0], boxX[2]-boxX[0], boxY[2]-boxY[0]);
+				cx.fillStyle = "black";
+				cx.save();
+			//	cx.translate(this.x, this.y);
+				/*cx.fillRect(m1[0], m1[1], 5, 5);
+				cx.fillRect(m2[0], m2[1], 5, 5);
+				cx.fillRect(m3[0], m3[1], 5, 5);
+				cx.fillRect(m4[0], m4[1], 5, 5);*/
+				cx.restore();
+				////////console.log(m4);
+				return collisionConvexPolygon(boxX, boxY, coords[0], coords[1]);
+				
+				
+			}
+			
+			this.act = function(){
+				
+				this.draw();
+				this.think();
+			}
+			
+			
+		};
+		
+		function Shell(x, y, vx, vy, rota){
+			this.vx = vx;
+			this.vy = vy;
+			this.x = x;
+			
+			this.y = y;
+			this.rot = rota;
+			this.rad = 0;
+			this.exploding = 0;
+			this.draw = function(){
+				cx.save();
+				cx.translate(this.x, this.y);
+				cx.rotate(this.rot);
+				cx.fillStyle = 'rgb(110, 110, 110)';
+				cx.fillRect(-15, -15, 30, 30);
+				cx.restore();
+			}
+			
+			this.act = function(){
+				if(this.exploding == 0){
+					this.move();
+				} 
+				if(this.exploding == 1) {
+					this.explode();
+				} 
+				console.log(this.rad+", "+this.exploding);
+				if(dist(this.x, this.y, px, py) < 10){
+					this.exploding = 1;
+					
+				}
+				this.draw();
+			}
+			this.move = function(){
+				this.x += this.vx;
+				this.y += this.vy;
+			}
+			this.explode = function(){
+				cx.save();
+				cx.translate(this.x, this.y);
+				cx.drawImage(explosion, -0.5*this.rad, -0.5*((6/5)*this.rad), this.rad, (6/5)*this.rad);
+				if(this.rad >= 75){
+					this.exploding = -1;
+				}
+				this.rad+=1;
+				cx.restore();
+			}
+		}
+		
+		function Point(x, y){
+			this.x = x;
+			this.y = y;
+		}
+		
+		function dist(x1, y1, x2, y2){
+			var a = x1 - x2
+			var b = y1 - y2
+
+			return Math.sqrt( a*a + b*b );
+		}
+		
+		function multiply(m1, m2) {
+			var result = [];
+			for (var i = 0; i < m1.length; i++) {
+				result[i] = [];
+				for (var j = 0; j < m2[0].length; j++) {
+					var sum = 0;
+					for (var k = 0; k < m1[0].length; k++) {
+						sum += m1[i][k] * m2[k][j];
+					}
+					result[i][j] = sum;
+				}
+			}
+			return result;
+		}
+		function Wall(x, y, w, h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+			this.draw = function(){
+				cx.fillStyle = "black";
+				cx.fillRect(this.x, this.y, this.w, this.h);
+			}
+			this.coords = function(){
+				return [[this.x, this.x+w, this.x+w, this.x], [this.y, this.y, this.y+h, this.y+h]];
+			}
+		}
+		
+		function display(m) {
+		  for (var r = 0; r < m.length; ++r) {
+			document.write('&nbsp;&nbsp;'+m[r].join(' ')+'<br />');
+		  }
+		}
+		var t = new Tank(500, 300);
+		//alert((multiply([[Math.cos(3), -1*Math.sin(3)], [Math.sin(3), Math.cos(3)]], [[475], [275]])));
+		
+		
+		
+		
+		
+		
+		
+		//alert(t.detect(w.coords()));
+		var player = function(){
+			cx.fillStyle = "black";
+			cx.save();
+			cx.translate(px, py);
+			cx.rotate(prot);
+			//cx.fillRect(-25, -25, 50, 50);
+			cx.restore();
+			//////console.log(t.x+", "+t.y);
+			
+		}
+		
+		var drawGame = function(){
+			background(255, 255, 255);
+			//////console.log(tanks[1].x+", "+tanks[1].y);
+			
+			for(k = 0; k < gameObjects.length; k++){
+				gameObjects[k].draw();
+			}
+			for(h = 0; h < tanks.length; h++){
+				tanks[h].act();
+			}
+			if(shells.length > 0){
+				console.log(shells[0]);
+			}
+			
+			for(k = 0; k < shells.length; k++){
+				if(shells[k].exploding != -1){
+					shells[k].act();
+					
+				}
+				
+				if(shells[k].exploding == -1){
+					shells.splice(k, 1);
+				}
+			}
+			
+			//////console.log(tanks.length);
+			player();
+			keyControl();
+			if(enemyForm){
+				if(form == 'circle'){
+					for(k = 0; k < tanks.length; k++){
+						//cx.fillStyle = "black";
+						//cx.fillRect(px+(100*(Math.cos(2*Math.PI*((k)/tanks.length)))), py+(100*(Math.sin(2*Math.PI*((k)/tanks.length)))), 5, 5);
+						
+						
+						tanks[k].targ = new Point(px+100*(Math.cos(2*Math.PI*((k)/tanks.length))), py+100*(Math.sin(2*Math.PI*((k)/tanks.length))));
+					}
+				}
+				if(form == 'v'){
+					cons = 50;
+					for(k = -1*(tanks.length/2)+1; k < (tanks.length/2); k++){
+						////console.log("yeee");
+						//if(k > tanks.length/2){
+							cx.fillStyle = "black";
+							cx.save();
+							cx.translate(px, py);
+							
+								cx.fillRect(k*cons, -1*Math.abs(k*cons)+100, 5, 5);
+							
+							cx.restore();
+							tanks[k+tanks.length/2].targ = new Point(px+k*cons, py+(-1*Math.abs(k*cons))+100);
+						/*} else {
+							
+						}*/
+					}
+					tanks[0].targ = new Point(px, 100+py+cons/2);
+				}
+			}
+			////console.log(form);
+			
+			
+		}
+		
+		var background = function(r, g, b){
+			cx.fillStyle = 'rgb('+r+','+g+','+b+')';
+			cx.fillRect(0, 0, 900, 500);
+		}
+		
+		setInterval(drawGame, 20);
+		
+	</script>
+  </body>
+</html>
