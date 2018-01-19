@@ -26,7 +26,7 @@
 		var vbxNO = [20, 80, 300, 20];
 		var vbyNO = [20, 20, 300, 80];
 		var form = 'v';
-		var enemyForm = true;
+		var enemyForm = false;
 		var grav = 0.01;
 		
 		var shells = [];
@@ -35,22 +35,49 @@
 		
 		var w7 = new Wall(300, 100, 50, 150);
 		
-		var gameObjects = [];
+		var gameObjects = [w];
 		var enemyBase = new Image();
 		var enemyCannon = new Image();
 		var explosion = new Image();
+		var pBase = new Image();
+		var pCannon = new Image();
 		var numTanks = 7; 
+		
+		var mouseX;
+		var mouseY;
 		
 		enemyBase.src = 'RedBase.png';
 		enemyCannon.src = 'RedCannon.png';
 		explosion.src = 'explosion.png';
+		pBase.src = 'BlueBase.png';
+		pCannon.src = 'BlueCannon.png';
 		var tanks = [];
 		//tanks.push(new Tank(500, 300));
 		//tanks.push(new Tank(00, 300));
 		for(k = 0; k < numTanks; k++){
-			tanks.push(new Tank(800/(k+1), 400, k));
+			tanks.push(new Tank(800/(k+1), 300, k));
 		}
-
+		var clicked = false;
+		canvas.addEventListener("mousemove", getMouseCoords, false);
+		canvas.addEventListener("mousedown", function(event){clicked = true;}, false);
+		canvas.addEventListener("mouseup", function(event){clicked = false;}, false);
+		
+		function getMouseCoords(event) {
+			var clickX = event.clientX;		//x and y relative to the 
+			var clickY = event.clientY;
+			
+			var targ = event.target;
+			rec = targ.getBoundingClientRect();
+			var relX = rec.left;
+			var relY = rec.top;
+			mouseX = clickX-relX;
+			mouseY = clickY-relY;
+			
+			
+			
+			
+		}
+		
 		//alert(collisionConvexPolygon(vax, vay, vbxNO, vbyNO ) );
 
 		function collisionConvexPolygon ( vertsax, vertsay, vertsbx, vertsby ) {
@@ -166,6 +193,10 @@
 			
 		}
 		
+		function Attribute(s, a){
+		
+		}
+		
 		function Tank(x, y, p){
 			this.x = x;
 			this.y = y;
@@ -182,7 +213,7 @@
 			this.formation = enemyForm;
 			this.shotSpeed = 10;
 			this.reload = 50;
-			this.reloading = this.reload;
+			this.reloading = 0;
 			this.shotTarg = new Point(px, py);
 			
 			this.draw = function(){
@@ -192,7 +223,7 @@
 				if(this.formation && dist(this.x, this.y, this.targ.x, this.targ.y) < 2){
 					cx.rotate(Math.atan2(py-this.y, px-this.x));
 				} else {
-					cx.rotate(this.rot);
+					cx.rotate(this.srot);
 				}
 				cx.rotate(Math.PI/2);
 				cx.drawImage(enemyBase, -25, -25, 50, 50);
@@ -203,7 +234,7 @@
 				cx.rotate(Math.PI/2);
 				
 				cx.rotate(Math.atan2(py-this.y, px-this.x));
-				cx.drawImage(enemyCannon, -25, -25, 50, 50);
+				cx.drawImage(enemyCannon, -25, -1*(37*(50/64)), 50, 50);
 				cx.rotate(-Math.atan2(py-this.y, px-this.x));
 				cx.rotate(-Math.PI/2);
 				
@@ -239,16 +270,24 @@
 			}
 			
 			this.shoot = function(rota){
+				if(this.p==0){
 				this.shotTarg = new Point(px, py);
 				d = dist(this.x, this.y, this.shotTarg.x, this.shotTarg.y);
 				
 				
-				if(this.reloading == 0){
+				if(this.reloading == 0){// && d < 150){
 					temps = new Shell(this.x, this.y, Math.cos(rota)*this.shotSpeed, Math.sin(rota)*this.shotSpeed, rota);
+					if(clicked){
+					console.log(temps);
+					}
 					shells.push(temps);
 					this.reloading = this.reload;
 				}
-				this.reloading--;
+				if(this.reloading > 0){
+					this.reloading--;
+				
+				}
+				}
 				
 			}
 			
@@ -313,7 +352,7 @@
 				for (k = 0; k < tanks.length; k++) {
 					t = tanks[k];
 					if(!this.formation){
-						if (k.x != this.x && t.p > this.p && dist(t.x, t.y, this.x, this.y) < 100) {
+						if (k.x != this.x && t.p < this.p && dist(t.x, t.y, this.x, this.y) < 100) {
 							this.x -= Math.cos(this.rot)*this.speed;
 							this.y -= Math.sin(this.rot)*this.speed;
 						}
@@ -447,10 +486,13 @@
 			this.vx = vx;
 			this.vy = vy;
 			this.x = x;
-			
+			this.ox = x; 
+			this.oy = y; //original x and y
+			this.s = 30;
 			this.y = y;
 			this.rot = rota;
 			this.rad = 0;
+			this.distance = 0;// dist(this.ox, this.oy, this.x, this.y);
 			this.exploding = 0;
 			this.draw = function(){
 				cx.save();
@@ -461,19 +503,43 @@
 				cx.restore();
 			}
 			
-			this.act = function(){
-				if(this.exploding == 0){
-					this.move();
-				} 
-				if(this.exploding == 1) {
-					this.explode();
-				} 
-				console.log(this.rad+", "+this.exploding);
-				if(dist(this.x, this.y, px, py) < 10){
-					this.exploding = 1;
+			this.checkWalls = function(){
+				for(k = 0; k < gameObjects.length; k++){
+					coords = gameObjects[k].coords();
 					
+					if(this.x > coords[0][0] && this.x < coords[0][1] && this.y > coords[1][0] && this.y < coords[1][2]){
+						this.exploding = 1;
+						
+					}
 				}
-				this.draw();
+			}
+			
+
+			
+			this.act = function(){
+				
+					this.distance = dist(this.ox, this.oy, this.x, this.y);
+					if(clicked){
+						console.log(this.distance);
+					}
+					
+					if(this.exploding == 1) {
+						this.explode();
+					} 
+					if(this.exploding == 0){
+						this.move();
+						this.draw();
+						//this.checkWalls();
+					} 
+					
+					//console.log(this.rad+", "+this.exploding);
+					if((dist(this.x, this.y, px, py) < 10 || this.distance > 250) && this.exploding == 0){
+						this.exploding = 1;
+						
+					}
+				
+				
+				
 			}
 			this.move = function(){
 				this.x += this.vx;
@@ -482,11 +548,12 @@
 			this.explode = function(){
 				cx.save();
 				cx.translate(this.x, this.y);
+				
 				cx.drawImage(explosion, -0.5*this.rad, -0.5*((6/5)*this.rad), this.rad, (6/5)*this.rad);
-				if(this.rad >= 75){
+				if(this.rad >= 150){
 					this.exploding = -1;
 				}
-				this.rad+=1;
+				this.rad+=10;
 				cx.restore();
 			}
 		}
@@ -550,9 +617,24 @@
 			cx.fillStyle = "black";
 			cx.save();
 			cx.translate(px, py);
+			
 			cx.rotate(prot);
+			cx.drawImage(pBase, -25, -25, 50, 50);
+			cx.restore();
+			cx.save();
+			cx.translate(px, py);
+			cx.rotate(Math.atan2(mouseY-py, mouseX-px)+(Math.PI/2));
+			cx.drawImage(pCannon, -25, -1*(37*(50/64)), 50, 50);
+			cx.fillStyle = "rgba(0, 0, 0, 0)";
+			cx.strokeStyle = "black";
+			cx.beginPath();
+			cx.arc(0, 0, 150, 0, Math.PI * 2);
+			cx.fill();
+			cx.stroke();
+			cx.closePath();
 			//cx.fillRect(-25, -25, 50, 50);
 			cx.restore();
+			
 			//////console.log(t.x+", "+t.y);
 			
 		}
@@ -567,19 +649,38 @@
 			for(h = 0; h < tanks.length; h++){
 				tanks[h].act();
 			}
-			if(shells.length > 0){
-				console.log(shells[0]);
-			}
+			
 			
 			for(k = 0; k < shells.length; k++){
+			
+				//console.log(typeof(shells[k])+", "+shells[k].rad+", "+shells[k].exploding);
+				
+				
+				//console.log(typeof(shells[k]));
+				if(shells[k].exploding == -1){
+					shells.splice(k, 1);
+					k--;
+					if(shells.length == 0){
+						break;
+					}
+				}
+				
 				if(shells[k].exploding != -1){
+					//console.log(typeof(shells[k]));
 					shells[k].act();
+					//console.log(typeof(shells[k]));
+				}
+				
+				if(shells[k].exploding == 0){
+					shells[k].checkWalls();
 					
 				}
 				
-				if(shells[k].exploding == -1){
-					shells.splice(k, 1);
-				}
+				//console.log(typeof(shells[k]));
+				
+				
+				
+				
 			}
 			
 			//////console.log(tanks.length);
