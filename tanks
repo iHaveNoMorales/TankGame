@@ -12,14 +12,17 @@
   </head>
   <body>
 	<canvas width="900" height="500" id="can"></canvas>
-	<input type="range" id="input">
+	<input type="text" id="input">
 	<script>
 		var px = 200;
 		var py = 200;
 		var canvas = document.getElementById("can");
 		var cx = canvas.getContext("2d");
 		var prot = 0;
+		var preload = 0;
+		var preloadc = 40;
 		var pspeed = 5;
+		var textVal = document.getElementById("input").value;
 		
 		var vax = [200, 300, 200, 100];
 		var vay = [100, 200, 300, 200];
@@ -41,7 +44,7 @@
 		var explosion = new Image();
 		var pBase = new Image();
 		var pCannon = new Image();
-		var numTanks = 7; 
+		var numTanks = 17; 
 		
 		var mouseX;
 		var mouseY;
@@ -55,7 +58,7 @@
 		//tanks.push(new Tank(500, 300));
 		//tanks.push(new Tank(00, 300));
 		for(k = 0; k < numTanks; k++){
-			tanks.push(new Tank(800/(k+1), 300, k));
+			tanks.push(new Tank((k)*(800/numTanks), 300, k));
 		}
 		var clicked = false;
 		canvas.addEventListener("mousemove", getMouseCoords, false);
@@ -213,7 +216,8 @@
 			this.formation = enemyForm;
 			this.shotSpeed = 10;
 			this.reload = 50;
-			this.reloading = 0;
+			this.prev = [this.x, this.y, this.rot];
+			this.reloading = this.p*35;
 			this.shotTarg = new Point(px, py);
 			
 			this.draw = function(){
@@ -270,15 +274,15 @@
 			}
 			
 			this.shoot = function(rota){
-				if(this.p==0){
+				
 				this.shotTarg = new Point(px, py);
 				d = dist(this.x, this.y, this.shotTarg.x, this.shotTarg.y);
 				
 				
 				if(this.reloading == 0){// && d < 150){
-					temps = new Shell(this.x, this.y, Math.cos(rota)*this.shotSpeed, Math.sin(rota)*this.shotSpeed, rota);
+					temps = new Shell(this.x, this.y, Math.cos(rota)*this.shotSpeed, Math.sin(rota)*this.shotSpeed, rota, this.shotTarg, false);
 					if(clicked){
-					console.log(temps);
+						//console.log(temps);
 					}
 					shells.push(temps);
 					this.reloading = this.reload;
@@ -287,13 +291,16 @@
 					this.reloading--;
 				
 				}
-				}
+				
 				
 			}
 			
 			
 			this.think = function(){
 				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+				if(!(this.x > 0 || this.x <= 0)){
+					tanks.splice(this.p, 1);
+				}
 				if(!this.formation){
 					this.targ = new Point(px, py);
 				}
@@ -341,7 +348,7 @@
 				}
 				
 				
-				
+				this.prev = [this.x, this.y, this.rot];
 				
 					
 				
@@ -482,7 +489,7 @@
 			
 		};
 		
-		function Shell(x, y, vx, vy, rota){
+		function Shell(x, y, vx, vy, rota, target, play){
 			this.vx = vx;
 			this.vy = vy;
 			this.x = x;
@@ -493,69 +500,65 @@
 			this.rot = rota;
 			this.rad = 0;
 			this.distance = 0;// dist(this.ox, this.oy, this.x, this.y);
+			this.target = target;
 			this.exploding = 0;
+			this.isplayer = play;
 			this.draw = function(){
 				cx.save();
 				cx.translate(this.x, this.y);
 				cx.rotate(this.rot);
 				cx.fillStyle = 'rgb(110, 110, 110)';
-				cx.fillRect(-15, -15, 30, 30);
+				cx.fillRect(-(this.s/2), -(this.s/2), this.s, this.s);
 				cx.restore();
 			}
 			
-			this.checkWalls = function(){
-				for(k = 0; k < gameObjects.length; k++){
-					coords = gameObjects[k].coords();
-					
-					if(this.x > coords[0][0] && this.x < coords[0][1] && this.y > coords[1][0] && this.y < coords[1][2]){
-						this.exploding = 1;
-						
-					}
-				}
-			}
 			
-
 			
 			this.act = function(){
-				
-					this.distance = dist(this.ox, this.oy, this.x, this.y);
-					if(clicked){
-						console.log(this.distance);
-					}
+				this.distance = dist(this.ox, this.oy, this.x, this.y);
+				if(this.exploding == 0){
+					this.move();
+					this.draw();
 					
-					if(this.exploding == 1) {
-						this.explode();
-					} 
-					if(this.exploding == 0){
-						this.move();
-						this.draw();
-						//this.checkWalls();
-					} 
 					
-					//console.log(this.rad+", "+this.exploding);
-					if((dist(this.x, this.y, px, py) < 10 || this.distance > 250) && this.exploding == 0){
+				} else if(this.exploding == 1){
+					this.explode();
+				}
+				if(!play){
+					if((dist(this.x, this.y, this.target.x, this.target.y) < 20 && this.exploding == 0) || (this.distance > 2500 && this.exploding == 0)){
 						this.exploding = 1;
-						
+						//console.log(this.exploding);
 					}
-				
-				
+				} else {
+					for(o = 0; o < tanks.length; o++){
+						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 20 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
+							this.exploding = 1;
+							break;
+							//console.log(this.exploding);
+						}
+					}
+				}
 				
 			}
+			
 			this.move = function(){
-				this.x += this.vx;
-				this.y += this.vy;
+				this.x+=this.vx;
+				this.y+=this.vy;
 			}
+			
 			this.explode = function(){
+				this.rad+=15;
 				cx.save();
 				cx.translate(this.x, this.y);
 				
 				cx.drawImage(explosion, -0.5*this.rad, -0.5*((6/5)*this.rad), this.rad, (6/5)*this.rad);
-				if(this.rad >= 150){
+				cx.restore();
+				if(this.rad > 90){
 					this.exploding = -1;
 				}
-				this.rad+=10;
-				cx.restore();
 			}
+			
+			
 		}
 		
 		function Point(x, y){
@@ -592,6 +595,12 @@
 			this.draw = function(){
 				cx.fillStyle = "black";
 				cx.fillRect(this.x, this.y, this.w, this.h);
+				for(p = 0; p < shells.length; p++){
+					s = shells[p];
+					if(s.x > this.x && s.x < this.x+this.w && s.y > this.y && s.y < this.y+this.h){
+						shells[p].exploding = 1;
+					}
+				}
 			}
 			this.coords = function(){
 				return [[this.x, this.x+w, this.x+w, this.x], [this.y, this.y, this.y+h, this.y+h]];
@@ -634,13 +643,27 @@
 			cx.closePath();
 			//cx.fillRect(-25, -25, 50, 50);
 			cx.restore();
-			
+			if(clicked && preload == 0){
+				temps = new Shell(px, py, Math.cos(Math.atan2(mouseY-py, mouseX-px))*10, Math.sin(Math.atan2(mouseY-py, mouseX-px))*10, Math.atan2(mouseY-py, mouseX-px)+(Math.PI/2), new Point(200, 200), true);
+				shells.push(temps);
+				preload = preloadc;
+			}
+			if(preload > 0){
+				preload--;
+			}
 			//////console.log(t.x+", "+t.y);
 			
 		}
 		
 		var drawGame = function(){
+			console.log(shells.length);
 			background(255, 255, 255);
+			textVal = document.getElementById("input").value;
+			if(textVal < tanks.length){
+				if(textVal > 0){
+					console.log((tanks[textVal].x > 0 || tanks[textVal].x <=0));
+				}
+			}
 			//////console.log(tanks[1].x+", "+tanks[1].y);
 			
 			for(k = 0; k < gameObjects.length; k++){
@@ -657,24 +680,20 @@
 				
 				
 				//console.log(typeof(shells[k]));
+				
+				
+				
+				shells[k].act();
 				if(shells[k].exploding == -1){
 					shells.splice(k, 1);
 					k--;
 					if(shells.length == 0){
 						break;
 					}
-				}
-				
-				if(shells[k].exploding != -1){
-					//console.log(typeof(shells[k]));
-					shells[k].act();
-					//console.log(typeof(shells[k]));
-				}
-				
-				if(shells[k].exploding == 0){
-					shells[k].checkWalls();
 					
 				}
+				
+				
 				
 				//console.log(typeof(shells[k]));
 				
