@@ -23,6 +23,11 @@
 		var preloadc = 40;
 		var pspeed = 5;
 		var textVal = document.getElementById("input").value;
+		var pmaxhealth = 250;
+		var phealth = pmaxhealth;
+		var precoverc = 50;
+		var precover = 0;
+		
 		
 		var vax = [200, 300, 200, 100];
 		var vay = [100, 200, 300, 200];
@@ -219,6 +224,10 @@
 			this.prev = [this.x, this.y, this.rot];
 			this.reloading = this.p*35;
 			this.shotTarg = new Point(px, py);
+			this.recoverc = 50;
+			this.recover = this.recoverc;
+			this.maxhealth = 250;
+			this.health = this.maxhealth;
 			
 			this.draw = function(){
 				cx.fillStyle = "black";
@@ -248,7 +257,7 @@
 				//cx.fillRect(-25, -25, 25, 50);
 				
 				cx.fillStyle = "rgba(0, 0, 0, 0.1)";
-				cx.fillRect(-25, -25, dist(this.x, this.y, px, py), 50);
+				//cx.fillRect(-25, -25, dist(this.x, this.y, px, py), 50);
 				
 				
 				cx.beginPath();
@@ -263,11 +272,12 @@
 				cx.fillText(this.p, this.x, this.y-20);
 				cx.beginPath();
 				cx.moveTo(this.x, this.y);
-				cx.strokeStyle = 'red';
+				//cx.strokeStyle = 'red';
 				//cx.lineTo(px, py);
 				cx.stroke();
 				cx.closePath();
-				cx.fillRect(this.shotTarg.x, this.shotTarg.y, 15, 15);
+				
+				//cx.fillRect(this.shotTarg.x, this.shotTarg.y, 15, 15);
 					
 				
 				
@@ -298,6 +308,7 @@
 			
 			this.think = function(){
 				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+				this.hurt();
 				if(!(this.x > 0 || this.x <= 0)){
 					tanks.splice(this.p, 1);
 				}
@@ -370,6 +381,52 @@
 						}
 					}					
 				}
+			}
+			
+			this.hurt = function(){
+				for(e = 0; e < shells.length; e++){
+					if(shells[e].exploding == 1){
+						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad && this.recover == 0){
+							//this.health -=5;
+							this.recover = this.recoverc;
+						}
+					}
+				}
+				if(this.recover > 0){
+					this.recover --;
+				}
+				
+				cx.beginPath();
+				
+				
+				if(this.health > (this.maxhealth*4)/5 && this.health <= (this.maxhealth*5)/5){
+					cx.strokeStyle = 'rgb(173, 209, 14)';
+					
+				}
+				if(this.health > (this.maxhealth*3)/5 && this.health <= (this.maxhealth*4)/5){
+					cx.strokeStyle = 'rgb(209, 192, 14)';
+				}
+				if(this.health > (this.maxhealth*2)/5 && this.health <= (this.maxhealth*3)/5){
+					cx.strokeStyle = 'rgb(209, 154, 14)';
+					cx.strokeStyle = "black";
+				}
+				if(this.health > (this.maxhealth*1)/5 && this.health <= (this.maxhealth*2)/5){
+					cx.strokeStyle = 'rgb(209, 105, 14)';
+				}
+				if(this.health > 0 && this.health <= (this.maxhealth*1)){
+					cx.strokeStyle = 'rgb(209, 50, 14)';
+				}
+				
+				this.health-=10;
+				
+				console.log(cx.strokeStyle);
+				cx.arc(this.x, this.y, 40, 0, (this.health/this.maxhealth)*(Math.PI * 2));
+				//cx.fill();
+				cx.lineWidth = 7;
+				cx.stroke();
+				cx.lineWidth = 1;
+				cx.closePath();
+				
 			}
 			
 			this.pathFind = function(){
@@ -651,13 +708,51 @@
 			if(preload > 0){
 				preload--;
 			}
-			//////console.log(t.x+", "+t.y);
+			for(q = 0; q < shells.length; q++){
+				if(shells[q].exploding == 1){
+					if(dist(shells[q].x, shells[q].y, px, py) <= shells[q].rad && precover == 0){
+						phealth -=0;
+						precover = precoverc;
+					}
+				}
+			}
 			
+			if(precover > 0){
+				precover--;
+			}
+			//console.log(phealth);
+		
+			
+		}
+		var healthbar = function(){
+			cx.fillStyle = 'rgba(0, 0, 0, 0)';
+			cx.strokeStyle = "rgb(0, 0, 0)";
+			cx.fillRect(5, 5, 100, 10);
+			cx.strokeRect(5, 5, 100, 10);
+			
+			if(phealth > (pmaxhealth*4)/5 && phealth <= (pmaxhealth*5)/5){
+				cx.fillStyle = 'rgb(173, 209, 14)';
+			}
+			if(phealth > (pmaxhealth*3)/5 && phealth <= (pmaxhealth*4)/5){
+				cx.fillStyle = 'rgb(209, 192, 14)';
+			}
+			if(phealth > (pmaxhealth*2)/5 && phealth <= (pmaxhealth*3)/5){
+				cx.fillStyle = 'rgb(209, 154, 14)';
+			}
+			if(phealth > (pmaxhealth*1)/5 && phealth <= (pmaxhealth*2)/5){
+				cx.fillStyle = 'rgb(209, 105, 14)';
+			}
+			if(phealth > 0 && phealth <= (pmaxhealth*1)){
+				cx.fillStyle = 'rgb(209, 50, 14)';
+			}
+			cx.fillRect(5, 5, (phealth/pmaxhealth)*100, 10);
 		}
 		
 		var drawGame = function(){
-			console.log(shells.length);
+			//console.log(shells.length);
+			//console.log(tanks[0].health);
 			background(255, 255, 255);
+			healthbar();
 			textVal = document.getElementById("input").value;
 			if(textVal < tanks.length){
 				if(textVal > 0){
@@ -671,6 +766,16 @@
 			}
 			for(h = 0; h < tanks.length; h++){
 				tanks[h].act();
+				console.log(tanks.length+", "+h);
+				if(tanks[h].health <= 0){
+					tanks.splice(h, 1);
+					if(tanks.length > 0){
+						h--;
+					}
+					console.log(tanks.length+", "+h);
+				}
+				
+				
 			}
 			
 			
@@ -703,7 +808,9 @@
 			}
 			
 			//////console.log(tanks.length);
-			player();
+			if(phealth > 0){
+				player();
+			}
 			keyControl();
 			if(enemyForm){
 				if(form == 'circle'){
