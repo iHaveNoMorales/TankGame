@@ -27,6 +27,7 @@
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
+		var fc = 0;
 		
 		
 		var vax = [200, 300, 200, 100];
@@ -50,6 +51,8 @@
 		var pBase = new Image();
 		var pCannon = new Image();
 		var numTanks = 17; 
+		
+		var screen = 0;
 		
 		var mouseX;
 		var mouseY;
@@ -866,6 +869,43 @@
 			}
 			////console.log(form);
 			
+			fc++;
+		}
+		var loadAni = 500;
+		function loading(){
+			background(255, 255, 255);
+			console.log(loadAni);
+			loadAni--;
+			if(loadAni == 0){
+				screen = 1;
+			}
+			cx.font = 'italic 40px Arial';
+			cx.fillStyle = 'rgb(50, 0, 0)';
+			cx.textAlign = 'center';
+			cx.fillText('Tanks', 450, 200);
+			cx.fillStyle = "white";
+			wide = cx.measureText('Tanks').width;
+			if(900-((loadAni-200)*5) < 450-wide/2){
+				cx.fillRect(450-wide/2, 150, wide, 100);
+			} else {
+				fc++;
+				cx.fillRect(450-wide/2+(fc*5), 150, wide, 100);
+			}
+			if(loadAni < 390 && loadAni > 195){
+				cx.save();
+				cx.translate(900-((loadAni-200)*5), 185);
+				cx.rotate(Math.PI/2);
+				cx.drawImage(pBase, -25, -25, 50, 50);
+				cx.drawImage(pCannon, -25, -25, 50, 50);
+				cx.restore();
+			}
+			if(loadAni < 110){
+				screen = 1;
+				fc = 0;
+			}
+			
+			
+			
 			
 		}
 		
@@ -873,8 +913,15 @@
 			cx.fillStyle = 'rgb('+r+','+g+','+b+')';
 			cx.fillRect(0, 0, 900, 500);
 		}
-		
-		setInterval(drawGame, 20);
+		if(screen == 0){
+			setInterval(loading, 20);
+		}
+		if(screen == 1){
+			setInterval(menu, 20);
+		}
+		if(screen == 2){
+			setInterval(drawGame, 20);
+		}
 		
 	</script>
   </body>
