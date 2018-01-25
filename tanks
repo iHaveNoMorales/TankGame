@@ -775,6 +775,7 @@
 		var drawGame = function(){
 			//console.log(shells.length);
 			//console.log(tanks[0].health);
+			
 			w.x++;
 			background(255, 255, 255);
 			healthbar();
@@ -909,19 +910,65 @@
 			
 		}
 		
+		function Button(x, y, action, oncolor, offcolor, name){
+			this.x = x;
+			this.y = y;
+			this.w = 150;
+			this.h = 50;
+			this.action = action;
+			
+			this.act = function(){
+				if(mouseX > this.x-(this.w/2) && mouseX < this.x+(this.w/2) && mouseY > this.y-(this.h/2) && mouseY < this.y+(this.h/2)){
+					cx.fillStyle = oncolor;
+					if(clicked){
+						this.action();
+						screen = 2;
+					}
+				} else {
+					cx.fillStyle = offcolor;
+				}
+				cx.fillRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
+				cx.font = 'bold 30px Arial';
+				cx.fillStyle = 'rgb(0, 0, 0)';
+				cx.textAlign = 'center';
+				cx.fillText('Play', x, y+this.h/5);
+				cx.strokeStyle = 'rgb(0, 0, 0)';
+				cx.strokeRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
+			}
+		}
+		
+		function menu(){
+			background(255, 255, 255);
+			playbutton = new Button(450, 100, function(){screen = 2}, 'rgb(173, 173, 255)', 'rgb(255, 173, 173)', "Play");
+			if(screen == 1){
+				playbutton.act();
+			}
+			console.log(screen);
+			
+			
+		}
+		
 		var background = function(r, g, b){
 			cx.fillStyle = 'rgb('+r+','+g+','+b+')';
 			cx.fillRect(0, 0, 900, 500);
 		}
-		if(screen == 0){
-			setInterval(loading, 20);
+		var screenFunction = function(){
+			
+			console.log(screen);
+			if(screen == 0){
+				loading();
+			} 
+			if(screen == 1){
+				menu();
+				
+			}
+			if(screen == 2){
+				drawGame();
+			}
 		}
-		if(screen == 1){
-			setInterval(menu, 20);
-		}
-		if(screen == 2){
-			setInterval(drawGame, 20);
-		}
+		setInterval(screenFunction, 20);
+		
+		
 		
 	</script>
   </body>
