@@ -27,6 +27,7 @@
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
+		var fc = 0;
 		
 		
 		var vax = [200, 300, 200, 100];
@@ -39,7 +40,7 @@
 		
 		var shells = [];
 		
-		var w = new Wall(100, 100, 50, 150);
+		var w = new Wall(100, 100, 25, 150);
 		
 		var w7 = new Wall(300, 100, 50, 150);
 		
@@ -50,6 +51,8 @@
 		var pBase = new Image();
 		var pCannon = new Image();
 		var numTanks = 17; 
+		
+		var screen = 0;
 		
 		var mouseX;
 		var mouseY;
@@ -228,6 +231,7 @@
 			this.recover = this.recoverc;
 			this.maxhealth = 250;
 			this.health = this.maxhealth;
+			this.inWall = false;
 			
 			this.draw = function(){
 				cx.fillStyle = "black";
@@ -307,10 +311,11 @@
 			
 			
 			this.think = function(){
+			this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
 				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
 				this.hurt();
 				if(!(this.x > 0 || this.x <= 0)){
-					tanks.splice(this.p, 1);
+					//tanks.splice(this.p, 1);
 				}
 				if(!this.formation){
 					this.targ = new Point(px, py);
@@ -332,15 +337,23 @@
 					this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
 					this.tempPath = false;
 				}
-				this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
-				if(this.blocked && !this.tempPath){
-					this.pathFind();
+				
+				if(this.blocked && !this.tempPath && !this.inWall){
+					
+						this.pathFind();
+						
+					
 					
 				}
+				console.log(this.tempPath + ", "+this.blocked);
+				
 				//////console.log(this.blocked+", "+this.tempPath);
 				if(this.tempPath){
-					this.x += Math.cos(this.rot)*this.speed;
-					this.y += Math.sin(this.rot)*this.speed;
+						if(!this.blocked){
+							this.x += Math.cos(this.rot)*this.speed;
+							this.y += Math.sin(this.rot)*this.speed;
+						}
+					
 					if(this.pathTimer == 0){
 						this.pathFind();
 					}
@@ -387,7 +400,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad && this.recover == 0){
-							//this.health -=5;
+							this.health -=5;
 							this.recover = this.recoverc;
 						}
 					}
@@ -417,10 +430,12 @@
 					cx.strokeStyle = 'rgb(209, 50, 14)';
 				}
 				
-				this.health-=10;
 				
-				console.log(cx.strokeStyle);
-				cx.arc(this.x, this.y, 40, 0, (this.health/this.maxhealth)*(Math.PI * 2));
+				
+				//console.log(cx.strokeStyle);
+				if(!this.inWall){
+					cx.arc(this.x, this.y, 40, 0, (this.health/this.maxhealth)*(Math.PI * 2));
+				}
 				//cx.fill();
 				cx.lineWidth = 7;
 				cx.stroke();
@@ -494,9 +509,18 @@
 							return this.detect(c, rota);
 						}
 					}
-					
+					if(this.x-50 < objects[i].x + objects[i].w && this.x+50 > objects[i].x &&  this.y-50 < objects[i].y + objects[i].h && this.y+50 > objects[i].y ){
+						this.inWall = true;
+						//console.log("YEEEEE");
+					} else {
+						this.inWall = false;
+					}
 				}
 				return false;
+				
+			}
+			
+			this.collideWalls = function(){
 				
 			}
 			
@@ -751,12 +775,14 @@
 		var drawGame = function(){
 			//console.log(shells.length);
 			//console.log(tanks[0].health);
+			
+			w.x++;
 			background(255, 255, 255);
 			healthbar();
 			textVal = document.getElementById("input").value;
 			if(textVal < tanks.length){
 				if(textVal > 0){
-					console.log((tanks[textVal].x > 0 || tanks[textVal].x <=0));
+					//console.log((tanks[textVal].x > 0 || tanks[textVal].x <=0));
 				}
 			}
 			//////console.log(tanks[1].x+", "+tanks[1].y);
@@ -844,6 +870,81 @@
 			}
 			////console.log(form);
 			
+			fc++;
+		}
+		var loadAni = 500;
+		function loading(){
+			background(255, 255, 255);
+			console.log(loadAni);
+			loadAni--;
+			if(loadAni == 0){
+				screen = 1;
+			}
+			cx.font = 'italic 40px Arial';
+			cx.fillStyle = 'rgb(50, 0, 0)';
+			cx.textAlign = 'center';
+			cx.fillText('Tanks', 450, 200);
+			cx.fillStyle = "white";
+			wide = cx.measureText('Tanks').width;
+			if(900-((loadAni-200)*5) < 450-wide/2){
+				cx.fillRect(450-wide/2, 150, wide, 100);
+			} else {
+				fc++;
+				cx.fillRect(450-wide/2+(fc*5), 150, wide, 100);
+			}
+			if(loadAni < 390 && loadAni > 195){
+				cx.save();
+				cx.translate(900-((loadAni-200)*5), 185);
+				cx.rotate(Math.PI/2);
+				cx.drawImage(pBase, -25, -25, 50, 50);
+				cx.drawImage(pCannon, -25, -25, 50, 50);
+				cx.restore();
+			}
+			if(loadAni < 110){
+				screen = 1;
+				fc = 0;
+			}
+			
+			
+			
+			
+		}
+		
+		function Button(x, y, action, oncolor, offcolor, name){
+			this.x = x;
+			this.y = y;
+			this.w = 150;
+			this.h = 50;
+			this.action = action;
+			
+			this.act = function(){
+				if(mouseX > this.x-(this.w/2) && mouseX < this.x+(this.w/2) && mouseY > this.y-(this.h/2) && mouseY < this.y+(this.h/2)){
+					cx.fillStyle = oncolor;
+					if(clicked){
+						this.action();
+						screen = 2;
+					}
+				} else {
+					cx.fillStyle = offcolor;
+				}
+				cx.fillRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
+				cx.font = 'bold 30px Arial';
+				cx.fillStyle = 'rgb(0, 0, 0)';
+				cx.textAlign = 'center';
+				cx.fillText('Play', x, y+this.h/5);
+				cx.strokeStyle = 'rgb(0, 0, 0)';
+				cx.strokeRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
+			}
+		}
+		
+		function menu(){
+			background(255, 255, 255);
+			playbutton = new Button(450, 100, function(){screen = 2}, 'rgb(173, 173, 255)', 'rgb(255, 173, 173)', "Play");
+			if(screen == 1){
+				playbutton.act();
+			}
+			console.log(screen);
+			
 			
 		}
 		
@@ -851,8 +952,23 @@
 			cx.fillStyle = 'rgb('+r+','+g+','+b+')';
 			cx.fillRect(0, 0, 900, 500);
 		}
+		var screenFunction = function(){
+			
+			console.log(screen);
+			if(screen == 0){
+				loading();
+			} 
+			if(screen == 1){
+				menu();
+				
+			}
+			if(screen == 2){
+				drawGame();
+			}
+		}
+		setInterval(screenFunction, 20);
 		
-		setInterval(drawGame, 20);
+		
 		
 	</script>
   </body>
