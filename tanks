@@ -25,7 +25,7 @@
 		var pyvel = 0;
 		var pxvel = 0;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 250;
+		var pmaxhealth = 100;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
@@ -55,7 +55,7 @@
 		var pCannon = new Image();
 		var pShot = new Image();
 		var eShot = new Image();
-		var numTanks = 17; 
+		var numTanks = 4; 
 		
 		var screen = 2;
 		
@@ -198,35 +198,32 @@
 
 		function keyControl(){
 			
+			if(phealth>0){ //tank doesn't move after death
 			
-			if(keys[87]){
-				pyvel = -1*Math.cos(prot)*pspeed;
-				pxvel = Math.sin(prot)*pspeed;
-				
+				if(keys[87]){
+					pyvel = -1*Math.cos(prot)*pspeed;
+					pxvel = Math.sin(prot)*pspeed;
+					
+				}
+				if(keys[83]){
+					pyvel = Math.cos(prot)*pspeed;
+					pxvel = -1*Math.sin(prot)*pspeed;
+				}
+				if(keys[68]){
+					prot+=0.08;
+				}
+				if(keys[65]){
+					prot-=0.08;
+				}
+				py+=pyvel;
+				px+=pxvel;
+				if(pInWall()){
+					py-=pyvel;
+					px-=pxvel;
+				}
+				pyvel = 0;
+				pxvel = 0;
 			}
-			if(keys[83]){
-				pyvel = Math.cos(prot)*pspeed;
-				pxvel = -1*Math.sin(prot)*pspeed;
-			}
-			if(keys[68]){
-				prot+=0.08;
-			}
-			if(keys[65]){
-				prot-=0.08;
-			}
-			py+=pyvel;
-			px+=pxvel;
-			if(pInWall()){
-				py-=pyvel;
-				px-=pxvel;
-			}
-			pyvel = 0;
-			pxvel = 0;
-			
-			
-			
-			
-			
 			
 		}
 		
@@ -269,12 +266,14 @@
 			this.shotTarg = new Point(px, py);
 			this.recoverc = 50;
 			this.recover = this.recoverc;
-			this.maxhealth = 0;
+
+			this.maxhealth = 25;
 			this.health = this.maxhealth;
 			this.inWall = false;
 			
 			this.draw = function(){
 				cx.fillStyle = "black";
+				
 				cx.save();
 				cx.translate(this.x, this.y);
 				if(this.formation && dist(this.x, this.y, this.targ.x, this.targ.y) < 2){
@@ -282,6 +281,7 @@
 				} else {
 					cx.rotate(this.srot);
 				}
+				
 				cx.rotate(Math.PI/2);
 				cx.drawImage(enemyBase, -25, -25, 50, 50);
 				cx.rotate(-Math.PI/2);
@@ -604,7 +604,9 @@
 			this.act = function(){
 				
 				this.draw();
-				this.think();
+				if(phealth>0){
+					this.think(); //stops enemies from shooting dead player
+				}
 			}
 			
 			
@@ -655,6 +657,9 @@
 						//console.log(this.exploding);
 					}
 				} else {
+					if(tanks.length==0 && (this.distance > 250 && this.exploding == 0)){
+						this.exploding=1;
+					}
 					for(o = 0; o < tanks.length; o++){
 						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 20 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
 							this.exploding = 1;
@@ -808,7 +813,8 @@
 			for(q = 0; q < shells.length; q++){
 				if(shells[q].exploding == 1){
 					if(dist(shells[q].x, shells[q].y, px, py) <= shells[q].rad && precover == 0){
-						phealth -= 0;
+
+						phealth -= 10;
 						precover = precoverc;
 					}
 				}
@@ -865,7 +871,7 @@
 				gameObjects[k].draw();
 			}
 			for(h = 0; h < tanks.length; h++){
-				tanks[h].act();
+				tanks[h].act(); 
 				//console.log(tanks.length+", "+h);
 				if(tanks[h].health <= 0){
 					tanks.splice(h, 1);
