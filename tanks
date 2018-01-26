@@ -260,9 +260,9 @@
 			this.turnVel = 0.04;
 			this.formation = enemyForm;
 			this.shotSpeed = 10;
-			this.reload = 50;
+			this.reload = this.p*50;
 			this.prev = [this.x, this.y, this.rot];
-			this.reloading = this.p*35;
+			this.reloading = 400;
 			this.shotTarg = new Point(px, py);
 			this.recoverc = 50;
 			this.recover = this.recoverc;
@@ -304,12 +304,7 @@
 				//cx.fillRect(-25, -25, dist(this.x, this.y, px, py), 50);
 				
 				
-				cx.beginPath();
-				cx.moveTo(0, 0);
-				cx.strokeStyle = 'red';
-				cx.lineTo(50, 0);
-				cx.stroke();
-				cx.closePath();	
+				
 				
 				cx.restore();
 				cx.fillStyle = "black";
@@ -440,7 +435,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad && this.recover == 0){
-							//this.health -=5;
+							this.health -=5;
 							this.recover = this.recoverc;
 						}
 					}
@@ -454,23 +449,18 @@
 				
 				if(this.health > (this.maxhealth*4)/5 && this.health <= (this.maxhealth*5)/5){
 					cx.strokeStyle = 'rgb(173, 209, 14)';
-					console.log("1");
 				}
 				if(this.health > (this.maxhealth*3)/5 && this.health <= (this.maxhealth*4)/5){
 					cx.strokeStyle = 'rgb(209, 192, 14)';
-					console.log("2");
 				}
 				if(this.health > (this.maxhealth*2)/5 && this.health <= (this.maxhealth*3)/5){
 					cx.strokeStyle = 'rgb(209, 154, 14)';
-					console.log("3");
 				}
 				if(this.health > (this.maxhealth*1)/5 && this.health <= (this.maxhealth*2)/5){
 					cx.strokeStyle = 'rgb(209, 105, 14)';
-					console.log("4");
 				}
 				if(this.health > 0 && this.health <= (this.maxhealth*1)/5){
 					cx.strokeStyle = 'rgb(209, 50, 14)';
-					console.log("5");
 				}
 				
 				cx.arc(this.x, this.y, 40, 0, (this.health/this.maxhealth)*(Math.PI * 2));
@@ -480,7 +470,7 @@
 				cx.stroke();
 				cx.lineWidth = 1;
 				cx.closePath();
-				this.health-=1;
+				
 				
 			}
 			
@@ -774,7 +764,7 @@
 			//cx.fillRect(-25, -25, 50, 50);
 			cx.restore();
 			if(clicked && preload == 0){
-				temps = new Shell(px, py, Math.cos(Math.atan2(mouseY-py, mouseX-px))*10, Math.sin(Math.atan2(mouseY-py, mouseX-px))*10, Math.atan2(mouseY-py, mouseX-px)+(Math.PI/2), new Point(200, 200), true);
+				temps = new Shell(px, py, Math.cos(cannonRot)*10, Math.sin(cannonRot)*10, cannonRot, new Point(-200, -200), true);
 				shells.push(temps);
 				preload = preloadc;
 			}
@@ -845,7 +835,7 @@
 			if(phealth > (pmaxhealth*1)/5 && phealth <= (pmaxhealth*2)/5){
 				cx.fillStyle = 'rgb(209, 105, 14)';
 			}
-			if(phealth > 0 && phealth <= (pmaxhealth*1)){
+			if(phealth > 0 && phealth <= (pmaxhealth*1)/5){
 				cx.fillStyle = 'rgb(209, 50, 14)';
 			}
 			cx.fillRect(5, 5, (phealth/pmaxhealth)*100, 10);
