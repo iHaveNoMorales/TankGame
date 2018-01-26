@@ -98,6 +98,8 @@
 			
 			
 		}
+		var cannonRot = 0;//(Math.atan2(mouseY-py, mouseX-px)+Math.PI*2);
+		
 		
 		//alert(collisionConvexPolygon(vax, vay, vbxNO, vbyNO ) );
 
@@ -267,7 +269,7 @@
 			this.shotTarg = new Point(px, py);
 			this.recoverc = 50;
 			this.recover = this.recoverc;
-			this.maxhealth = 250;
+			this.maxhealth = 0;
 			this.health = this.maxhealth;
 			this.inWall = false;
 			
@@ -349,7 +351,7 @@
 			
 			
 			this.think = function(){
-			this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
+				this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
 				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
 				this.hurt();
 				if(!(this.x > 0 || this.x <= 0)){
@@ -438,7 +440,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad && this.recover == 0){
-							this.health -=5;
+							//this.health -=5;
 							this.recover = this.recoverc;
 						}
 					}
@@ -452,33 +454,33 @@
 				
 				if(this.health > (this.maxhealth*4)/5 && this.health <= (this.maxhealth*5)/5){
 					cx.strokeStyle = 'rgb(173, 209, 14)';
-					
+					console.log("1");
 				}
 				if(this.health > (this.maxhealth*3)/5 && this.health <= (this.maxhealth*4)/5){
 					cx.strokeStyle = 'rgb(209, 192, 14)';
+					console.log("2");
 				}
 				if(this.health > (this.maxhealth*2)/5 && this.health <= (this.maxhealth*3)/5){
 					cx.strokeStyle = 'rgb(209, 154, 14)';
-					cx.strokeStyle = "black";
+					console.log("3");
 				}
 				if(this.health > (this.maxhealth*1)/5 && this.health <= (this.maxhealth*2)/5){
 					cx.strokeStyle = 'rgb(209, 105, 14)';
+					console.log("4");
 				}
-				if(this.health > 0 && this.health <= (this.maxhealth*1)){
+				if(this.health > 0 && this.health <= (this.maxhealth*1)/5){
 					cx.strokeStyle = 'rgb(209, 50, 14)';
+					console.log("5");
 				}
 				
+				cx.arc(this.x, this.y, 40, 0, (this.health/this.maxhealth)*(Math.PI * 2));
 				
-				
-				//console.log(cx.strokeStyle);
-				if(!this.inWall){
-					cx.arc(this.x, this.y, 40, 0, (this.health/this.maxhealth)*(Math.PI * 2));
-				}
 				//cx.fill();
 				cx.lineWidth = 7;
 				cx.stroke();
 				cx.lineWidth = 1;
 				cx.closePath();
+				this.health-=1;
 				
 			}
 			
@@ -755,7 +757,7 @@
 			cx.restore();
 			cx.save();
 			cx.translate(px, py);
-			cx.rotate(Math.atan2(mouseY-py, mouseX-px)+(Math.PI/2));
+			cx.rotate(cannonRot+Math.PI/2);
 			cx.drawImage(pCannon, -25, -1*(37*(50/64)), 50, 50);
 			cx.fillStyle = "rgba(0, 0, 0, 0)";
 			cx.strokeStyle = "black";
@@ -774,10 +776,39 @@
 			if(preload > 0){
 				preload--;
 			}
+			targRot = (Math.atan2(mouseY-py, mouseX-px)+Math.PI*2);
+			var canRotSpeed = 0.08;
+			//cannonRot %= (Math.PI*2);
+			
+			if(cannonRot > targRot){
+				if((Math.abs(cannonRot-(Math.PI*3)) + Math.abs(targRot-Math.PI)) < cannonRot-targRot){
+					cannonRot+=canRotSpeed;
+				} else {
+					cannonRot -= canRotSpeed;
+				}
+			} else if (cannonRot < targRot){
+				if((Math.abs(targRot - (Math.PI*3)) + Math.abs(cannonRot - Math.PI)) < targRot - cannonRot){
+					cannonRot-=canRotSpeed;
+				} else {
+					cannonRot += canRotSpeed;
+				}
+			}
+			
+			if(cannonRot > Math.PI*3){
+				cannonRot %= (Math.PI*2);
+			}
+			if(cannonRot < Math.PI){
+				cannonRot += (Math.PI*2);
+			}
+			
+			if(Math.abs(cannonRot-targRot) < canRotSpeed){
+				cannonRot = targRot;
+			}
+			cx.fillText(cannonRot+", "+targRot, 300, 300);
 			for(q = 0; q < shells.length; q++){
 				if(shells[q].exploding == 1){
 					if(dist(shells[q].x, shells[q].y, px, py) <= shells[q].rad && precover == 0){
-						phealth -=0;
+						phealth -= 0;
 						precover = precoverc;
 					}
 				}
