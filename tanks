@@ -63,7 +63,7 @@
 		var eShot = new Image();
 		var numTanks = 14; 
 		
-		var screen = 2;
+		var screen = 0;
 		
 		var mouseX;
 		var mouseY;
