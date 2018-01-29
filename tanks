@@ -30,6 +30,11 @@
 		var precoverc = 50;
 		var precover = 0;
 		var fc = 0;
+		var ammo = 10;
+		
+		
+		var timeScale = 0.5;
+		//var ammoc = 10;
 		
 		
 		var vax = [200, 300, 200, 100];
@@ -46,6 +51,7 @@
 		
 		var w7 = new Wall(300, 100, 50, 150);
 		var levelOne = [new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25)];
+		var ammoPacks = [new AmmoPack(400, 400)];
 		
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
@@ -55,7 +61,7 @@
 		var pCannon = new Image();
 		var pShot = new Image();
 		var eShot = new Image();
-		var numTanks = 4; 
+		var numTanks = 14; 
 		
 		var screen = 2;
 		
@@ -201,19 +207,19 @@
 			if(phealth>0){ //tank doesn't move after death
 			
 				if(keys[87]){
-					pyvel = -1*Math.cos(prot)*pspeed;
-					pxvel = Math.sin(prot)*pspeed;
+					pyvel = -1*Math.cos(prot)*pspeed*timeScale;
+					pxvel = Math.sin(prot)*pspeed*timeScale;
 					
 				}
 				if(keys[83]){
-					pyvel = Math.cos(prot)*pspeed;
-					pxvel = -1*Math.sin(prot)*pspeed;
+					pyvel = Math.cos(prot)*pspeed*timeScale;
+					pxvel = -1*Math.sin(prot)*pspeed*timeScale;
 				}
 				if(keys[68]){
-					prot+=0.08;
+					prot+=0.08*timeScale;
 				}
 				if(keys[65]){
-					prot-=0.08;
+					prot-=0.08*timeScale;
 				}
 				py+=pyvel;
 				px+=pxvel;
@@ -260,9 +266,10 @@
 			this.turnVel = 0.04;
 			this.formation = enemyForm;
 			this.shotSpeed = 10;
-			this.reload = this.p*50;
+			this.reloading = 65;
+			this.reload = (this.p+1)*this.reloading;
 			this.prev = [this.x, this.y, this.rot];
-			this.reloading = 400;
+			
 			this.shotTarg = new Point(px, py);
 			this.recoverc = 50;
 			this.recover = this.recoverc;
@@ -329,7 +336,7 @@
 				
 				
 				if(this.reloading == 0){// && d < 150){
-					temps = new Shell(this.x, this.y, Math.cos(rota)*this.shotSpeed, Math.sin(rota)*this.shotSpeed, rota, this.shotTarg, false);
+					temps = new Shell(this.x, this.y, Math.cos(rota)*this.shotSpeed*timeScale, Math.sin(rota)*this.shotSpeed*timeScale, rota, this.shotTarg, false);
 					if(clicked){
 						//console.log(temps);
 					}
@@ -360,13 +367,13 @@
 				if(!this.blocked){
 					if(!this.formation){
 						if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
-							this.x += Math.cos(this.rot)*this.speed;
-							this.y += Math.sin(this.rot)*this.speed;
+							this.x += Math.cos(this.rot)*this.speed*timeScale;
+							this.y += Math.sin(this.rot)*this.speed*timeScale;
 						}
 					} else {
 						if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
-							this.x += Math.cos(this.rot)*this.speed;
-							this.y += Math.sin(this.rot)*this.speed;
+							this.x += Math.cos(this.rot)*this.speed*timeScale;
+							this.y += Math.sin(this.rot)*this.speed*timeScale;
 						}
 					}
 					this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
@@ -385,24 +392,24 @@
 				//////console.log(this.blocked+", "+this.tempPath);
 				if(this.tempPath){
 						if(!this.blocked){
-							this.x += Math.cos(this.rot)*this.speed;
-							this.y += Math.sin(this.rot)*this.speed;
+							this.x += Math.cos(this.rot)*this.speed*timeScale;
+							this.y += Math.sin(this.rot)*this.speed*timeScale;
 						}
 					
 					if(this.pathTimer == 0){
 						this.pathFind();
 					}
 					if(this.pathTimer > 0){
-						this.pathTimer--;
+						this.pathTimer-=timeScale;
 					}
 				}
 				if(this.rot > this.srot){
-					this.srot+=this.turnVel;
+					this.srot+=this.turnVel*timeScale;
 				}
 				if(this.rot < this.srot){
-					this.srot-=this.turnVel;
+					this.srot-=this.turnVel*timeScale;
 				}
-				if(Math.abs(this.rot-this.srot) < this.turnVel){
+				if(Math.abs(this.rot-this.srot) < this.turnVel*timeScale){
 					this.srot = this.rot;
 				}
 				
@@ -419,13 +426,13 @@
 					t = tanks[k];
 					if(!this.formation){
 						if (k.x != this.x && t.p < this.p && dist(t.x, t.y, this.x, this.y) < 50) {
-							this.x -= Math.cos(this.rot)*this.speed;
-							this.y -= Math.sin(this.rot)*this.speed;
+							this.x -= Math.cos(this.rot)*this.speed*timeScale;
+							this.y -= Math.sin(this.rot)*this.speed*timeScale;
 						}
 					} else {
 						if (k.x != this.x && t.p > this.p && dist(t.x, t.y, this.x, this.y) < 0) {
-							this.x -= Math.cos(this.rot)*this.speed;
-							this.y -= Math.sin(this.rot)*this.speed;
+							this.x -= Math.cos(this.rot)*this.speed*timeScale;
+							this.y -= Math.sin(this.rot)*this.speed*timeScale;
 						}
 					}					
 				}
@@ -441,7 +448,7 @@
 					}
 				}
 				if(this.recover > 0){
-					this.recover --;
+					this.recover -=timeScale;
 				}
 				
 				cx.beginPath();
@@ -662,12 +669,12 @@
 			}
 			
 			this.move = function(){
-				this.x+=this.vx;
-				this.y+=this.vy;
+				this.x+=this.vx*timeScale;
+				this.y+=this.vy*timeScale;
 			}
 			
 			this.explode = function(){
-				this.rad+=15;
+				this.rad+=15*timeScale;
 				cx.save();
 				cx.translate(this.x, this.y);
 				
@@ -732,16 +739,8 @@
 			document.write('&nbsp;&nbsp;'+m[r].join(' ')+'<br />');
 		  }
 		}
-		var t = new Tank(500, 300);
-		//alert((multiply([[Math.cos(3), -1*Math.sin(3)], [Math.sin(3), Math.cos(3)]], [[475], [275]])));
 		
 		
-		
-		
-		
-		
-		
-		//alert(t.detect(w.coords()));
 		var player = function(){
 			cx.fillStyle = "black";
 			cx.save();
@@ -763,13 +762,14 @@
 			cx.closePath();
 			//cx.fillRect(-25, -25, 50, 50);
 			cx.restore();
-			if(clicked && preload == 0){
+			if(clicked && preload == 0 && ammo > 0){
 				temps = new Shell(px, py, Math.cos(cannonRot)*10, Math.sin(cannonRot)*10, cannonRot, new Point(-200, -200), true);
 				shells.push(temps);
 				preload = preloadc;
+				ammo-=timeScale;
 			}
 			if(preload > 0){
-				preload--;
+				preload-=timeScale;
 			}
 			targRot = (Math.atan2(mouseY-py, mouseX-px)+Math.PI*2);
 			var canRotSpeed = 0.08;
@@ -777,15 +777,15 @@
 			
 			if(cannonRot > targRot){
 				if((Math.abs(cannonRot-(Math.PI*3)) + Math.abs(targRot-Math.PI)) < cannonRot-targRot){
-					cannonRot+=canRotSpeed;
+					cannonRot+=canRotSpeed*timeScale;
 				} else {
-					cannonRot -= canRotSpeed;
+					cannonRot -= canRotSpeed*timeScale;
 				}
 			} else if (cannonRot < targRot){
 				if((Math.abs(targRot - (Math.PI*3)) + Math.abs(cannonRot - Math.PI)) < targRot - cannonRot){
-					cannonRot-=canRotSpeed;
+					cannonRot-=canRotSpeed*timeScale;
 				} else {
-					cannonRot += canRotSpeed;
+					cannonRot += canRotSpeed*timeScale;
 				}
 			}
 			
@@ -796,7 +796,7 @@
 				cannonRot += (Math.PI*2);
 			}
 			
-			if(Math.abs(cannonRot-targRot) < canRotSpeed){
+			if(Math.abs(cannonRot-targRot) < canRotSpeed*timeScale){
 				cannonRot = targRot;
 			}
 			cx.fillText(cannonRot+", "+targRot, 300, 300);
@@ -811,12 +811,42 @@
 			}
 			
 			if(precover > 0){
-				precover--;
+				precover-=timeScale;
+			}
+			for(f = 0; f < ammo; f++){
+				cx.drawImage(pShot, 5+((f)*12), 25, 10, 10);
 			}
 			//console.log(phealth);
 		
 			
 		}
+		function AmmoPack(x, y){
+			this.x = x;
+			this.y = y;
+			this.w = 20;
+			this.h = 20;
+			this.draw = function(){
+				cx.fillStyle = 'rgb(255, 0, 0)';
+				cx.fillRect(this.x, this.y, this.w, this.h);
+			}
+			
+			this.pickedUp = function(){
+				if (px - 25 < this.x + this.w &&
+				px + 25 > this.x &&
+				py - 25 < this.y + this.h &&
+				py + 25 > this.y ){
+					return true;
+				}
+			}
+			this.act = function(){
+				if(this.pickedUp()){
+					ammo+=5;
+				}
+				this.draw();
+			}
+		}
+		
+		
 		var healthbar = function(){
 			cx.fillStyle = 'rgba(0, 0, 0, 0)';
 			cx.strokeStyle = "rgb(0, 0, 0)";
@@ -840,14 +870,19 @@
 			}
 			cx.fillRect(5, 5, (phealth/pmaxhealth)*100, 10);
 		}
-		
+		//var ap = new AmmoPack(300, 400);
 		var drawGame = function(){
-			//console.log(shells.length);
-			//console.log(tanks[0].health);
 			
 			w.x++;
-			console.log(pInWall());
+			
 			background(255, 255, 255);
+			for(t = 0; t < ammoPacks.length; t++){
+				ammoPacks[t].act();
+				if(ammoPacks[t].pickedUp()){
+					ammoPacks.splice(t, 1);
+					t--;
+				}
+			}
 			healthbar();
 			textVal = document.getElementById("input").value;
 			if(textVal < tanks.length){
@@ -868,7 +903,7 @@
 					if(tanks.length > 0){
 						h--;
 					}
-					console.log(tanks.length+", "+h);
+					
 				}
 				
 				
