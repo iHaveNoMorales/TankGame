@@ -31,6 +31,7 @@
 		var precover = 0;
 		var fc = 0;
 		var ammo = 10;
+		var movePage = '';
 		
 		
 		var timeScale = 1;
@@ -44,14 +45,22 @@
 		var form = 'circle';
 		var enemyForm = false;
 		var grav = 0.01;
+		var pageOn = 0;
+		
+		
 		
 		var shells = [];
 		
 		var w = new Wall(100, 100, 25, 150);
 		
 		var w7 = new Wall(300, 100, 50, 150);
-		var levelOne = [new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)];
+		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
+		var tutorial = [];
+		var levels = [tutorial, levelOne]; //tank wall ammo
+		
+		
 		var ammoPacks = [new AmmoPack(400, 400)];
+		
 		
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
@@ -64,7 +73,7 @@
 		var aPack = new Image();
 		var numTanks = 14; 
 		
-		var screen = 2;
+		var screen = 3;
 		
 		var mouseX;
 		var mouseY;
@@ -204,6 +213,8 @@
 		},true);
 		var protvelc = 0.08;
 		var protvel = protvelc;
+		
+		var tempPage;
 		function keyControl(){
 			
 			if(phealth>0){ //tank doesn't move after death
@@ -219,6 +230,7 @@
 				}
 				if(keys[68]){
 					prot+=protvel*timeScale;
+					
 				}
 				if(keys[65]){
 					prot-=protvel*timeScale;
@@ -227,6 +239,29 @@
 					protvel = protvelc*1.25;
 				} else {
 					protvel = protvelc;
+				}
+				if(keys[81] && movePage == ''){
+					movePage = 'left';
+					tempPage = pageOn;
+					
+				}
+				if(keys[69] && movePage == ''){
+					movePage = 'right';
+					tempPage = pageOn;
+				}
+				if(movePage == 'right'){
+					if(pageOn < tempPage+1){
+						pageOn+=0.05;
+					} else {
+						movePage = '';
+					}
+				}
+				if(movePage == 'left'){
+					if(pageOn > tempPage-1){
+						pageOn-=0.05;
+					} else {
+						movePage = '';
+					}
 				}
 				
 				py+=pyvel;
@@ -1043,11 +1078,12 @@
 			
 		}
 		
-		function Button(x, y, action, oncolor, offcolor, name){
+		function Button(x, y, w, h, action, oncolor, offcolor, name, fontSize){
 			this.x = x;
 			this.y = y;
-			this.w = 150;
-			this.h = 50;
+			this.w = w;
+			this.h = h;
+			this.fontSize = fontSize;
 			this.action = action;
 			
 			this.act = function(){
@@ -1055,13 +1091,13 @@
 					cx.fillStyle = oncolor;
 					if(clicked){
 						this.action();
-						screen = 2;
+						
 					}
 				} else {
 					cx.fillStyle = offcolor;
 				}
 				cx.fillRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
-				cx.font = 'bold 30px Arial';
+				cx.font = 'bold '+this.fontSize+'px Arial';
 				cx.fillStyle = 'rgb(0, 0, 0)';
 				cx.textAlign = 'center';
 				cx.fillText('Play', x, y+this.h/5);
@@ -1072,12 +1108,83 @@
 		
 		function menu(){
 			background(255, 255, 255);
-			playbutton = new Button(450, 100, function(){screen = 2}, 'rgb(173, 173, 255)', 'rgb(255, 173, 173)', "Play");
+			playbutton = new Button(450, 100, 150, 50, function(){screen = 3;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 30);
 			if(screen == 1){
 				playbutton.act();
 			}
 			console.log(screen);
 			
+			
+		}
+		var levelPanels = [];
+		for(u = 0; u < 15; u++){
+			levelPanels.push(new LevelPanel(u, tanks.length, 10, tanks, levelOne, ));
+		}
+		
+		function LevelPanel(num, tankNum, ammoNum, tankList, wallList, ammoList){
+			this.num = num;
+			this.tankNum = tankNum;
+			this.ammoNum = ammoNum;
+			this.tankList = tankList;
+			this.wallList = wallList;
+			this.ammoList = ammoList;
+			
+			this.x = 0;
+			this.y = 0;
+			this.page = 0;
+			this.b; new Button(this)
+			this.draw = function(){
+				this.b = new Button(this.x+(-900*pageOn), this.y+100, 75, 25, this.playLevel, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 15)
+				if(this.num%10 < 5){
+					this.y = 75;
+				} else {
+					this.y = 275;
+				}
+				cx.save();
+				cx.translate(-900*pageOn, 0);
+				//console.log(-900*pageOn);
+				this.page = Math.floor(this.num/10);
+				
+				this.x = 150+((num%5)*150)+(this.page*900);
+				cx.fillStyle = 'rgb(0, 130, 255)';
+				
+		
+				cx.fillRect(this.x-50, this.y, 100, 150);
+				
+				cx.fillStyle = "black";
+				cx.font = '20px Arial';
+				cx.textAlign = "center";
+				if(num == 0){
+					cx.fillText("Tutorial", this.x, this.y+40);
+				} else {
+					cx.fillText(num, this.x, this.y+40);
+				}
+				cx.restore();
+				this.b.act();
+				
+			}
+			this.playLevel = function(){
+				
+				
+				tanks = levels[num][0];
+				gameObjects = levels[num][1];
+				ammoPacks = levels[num][2];
+				px = 200;
+				py = 200;
+				ammo = ammoNum;
+				ammoc = ammoNum;
+				screen = 2;
+				
+			}
+			
+		}
+		
+		var levelSelect = function(){
+			background(255, 255, 255);
+			for(var v in levelPanels){
+				levelPanels[v].draw();
+				//console.log(levelPanels[v]);
+			}
 			
 		}
 		
@@ -1096,9 +1203,15 @@
 				
 			}
 			if(screen == 2){
+			
 				drawGame();
 				cx.fillStyle = 'rgb(0, 0, 0)';
 			cx.fillText(mouseX+", "+mouseY, 0, 460);
+			}
+			if(screen == 3){
+				levelSelect();
+				keyControl();
+			
 			}
 		}
 		setInterval(screenFunction, 20);
