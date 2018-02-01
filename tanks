@@ -55,17 +55,14 @@
 		
 		var w7 = new Wall(300, 100, 50, 150);
 		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
-		var tutorial = [];
 		var levels = [tutorial, levelOne]; //tank wall ammo
 		
 		
 		var ammoPacks = [new AmmoPack(400, 400)];
 		
-<<<<<<< HEAD
+
 		var tutorial = [new Tank (800, 225, 0, true), new Wall(150,150, 25, 200), new AmmoPack(200, 225)]; //tank, wall, ammo packs
-=======
->>>>>>> d5e33729f1966cf15bc3e72aba24560d5e5d3455
-		
+
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
 		var enemyCannon = new Image();
@@ -418,7 +415,6 @@
 			
 			
 			this.think = function(){
-<<<<<<< HEAD
 				if(this.t==false){
 					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
 					this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
@@ -426,89 +422,84 @@
 					if(!(this.x > 0 || this.x <= 0)){
 						tanks.splice(this.p, 1);
 					}
-=======
-				this.getP();
-				this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
-				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
-				this.hurt();
-				if(!(this.x > 0 || this.x <= 0)){
-					tanks.splice(this.p, 1);
-				}
-				if(!this.formation){
-					this.targ = new Point(px, py);
-				}
-				
-				this.swarm();
-				if(!this.blocked){
->>>>>>> d5e33729f1966cf15bc3e72aba24560d5e5d3455
+					this.getP();
+					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
+					this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+					this.hurt();
+					if(!(this.x > 0 || this.x <= 0)){
+						tanks.splice(this.p, 1);
+					}
 					if(!this.formation){
 						this.targ = new Point(px, py);
 					}
-					
+				
 					this.swarm();
 					if(!this.blocked){
 						if(!this.formation){
-							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
-								this.x += Math.cos(this.rot)*this.speed*timeScale;
-								this.y += Math.sin(this.rot)*this.speed*timeScale;
-							}
-						} else {
-							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
-								this.x += Math.cos(this.rot)*this.speed*timeScale;
-								this.y += Math.sin(this.rot)*this.speed*timeScale;
-							}
+							this.targ = new Point(px, py);
 						}
+						
+						this.swarm();
+						if(!this.blocked){
+							if(!this.formation){
+								if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
+									this.x += Math.cos(this.rot)*this.speed*timeScale;
+									this.y += Math.sin(this.rot)*this.speed*timeScale;
+								}
+							}
+							else {
+								if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
+									this.x += Math.cos(this.rot)*this.speed*timeScale;
+									this.y += Math.sin(this.rot)*this.speed*timeScale;
+								}
+							}
+							this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
+							this.tempPath = false;
+						}
+
 						this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
 						this.tempPath = false;
 					}
-<<<<<<< HEAD
-=======
-					this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
-					this.tempPath = false;
-				}
-				
-				if(this.blocked && !this.tempPath){// && !this.inWall){
->>>>>>> d5e33729f1966cf15bc3e72aba24560d5e5d3455
 					
-					if(this.blocked && !this.tempPath && !this.inWall){
-						
-							this.pathFind();
+						if(this.blocked && !this.tempPath){// && !this.inWall){
 							
+								this.pathFind();
+								
+						}
 						
+						//console.log(this.tempPath + ", "+this.blocked);
 						
-					}
+
+						//////console.log(this.blocked+", "+this.tempPath);
+						if(this.tempPath){
+								if(!this.blocked){
+									this.x += Math.cos(this.rot)*this.speed*timeScale;
+									this.y += Math.sin(this.rot)*this.speed*timeScale;
+								}
+							
+							if(this.pathTimer == 0){
+								this.pathFind();
+							}
+							if(this.pathTimer > 0){
+								this.pathTimer-=timeScale;
+							}
+
+						
+						}
 					//console.log(this.tempPath + ", "+this.blocked);
 					
-<<<<<<< HEAD
 					//////console.log(this.blocked+", "+this.tempPath);
-					if(this.tempPath){
-							if(!this.blocked){
-								this.x += Math.cos(this.rot)*this.speed*timeScale;
-								this.y += Math.sin(this.rot)*this.speed*timeScale;
-							}
-						
+						if(this.tempPath){
+								
+							this.x += Math.cos(this.rot)*this.speed*timeScale;
+							this.y += Math.sin(this.rot)*this.speed*timeScale;
+								
+						}
 						if(this.pathTimer == 0){
 							this.pathFind();
 						}
-						if(this.pathTimer > 0){
-							this.pathTimer-=timeScale;
-						}
-=======
-					
-				}
-				//console.log(this.tempPath + ", "+this.blocked);
-				
-				//////console.log(this.blocked+", "+this.tempPath);
-				if(this.tempPath){
-						
-							this.x += Math.cos(this.rot)*this.speed*timeScale;
-							this.y += Math.sin(this.rot)*this.speed*timeScale;
-						
-					
-					if(this.pathTimer == 0){
-						this.pathFind();
->>>>>>> d5e33729f1966cf15bc3e72aba24560d5e5d3455
 					}
+					
 					if(this.rot > this.srot){
 						this.srot+=this.turnVel*timeScale;
 					}
