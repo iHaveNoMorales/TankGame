@@ -21,17 +21,21 @@
 		var prot = 0;
 		var preload = 0;
 		var preloadc = 40;
-		var pspeed = 5;
+		var pspeed = 10;
 		var pyvel = 0;
 		var pxvel = 0;
+		var yveltarg = 0;
+		var xveltarg = 0;
+		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 100;
+		var pmaxhealth = 10000;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
 		var fc = 0;
 		var ammo = 10;
 		var movePage = '';
+		var friction = 0.05;
 		
 		
 		var timeScale = 1;
@@ -51,9 +55,8 @@
 		
 		var shells = [];
 		
-		var w = new Wall(100, 100, 25, 150);
-		
-		var w7 = new Wall(300, 100, 50, 150);
+
+		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225)]]; //tank, wall, ammo packs
 		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
 		var levels = [tutorial, levelOne]; //tank wall ammo
 		
@@ -61,7 +64,7 @@
 		var ammoPacks = [new AmmoPack(400, 400)];
 		
 
-		var tutorial = [new Tank (800, 225, 0, true), new Wall(150,150, 25, 200), new AmmoPack(200, 225)]; //tank, wall, ammo packs
+		
 
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
@@ -221,13 +224,35 @@
 			if(phealth>0){ //tank doesn't move after death
 			
 				if(keys[87]){
-					pyvel = -1*Math.cos(prot)*pspeed*timeScale;
-					pxvel = Math.sin(prot)*pspeed*timeScale;
+					yveltarg = -1*Math.cos(prot)*pspeed*timeScale;
+					xveltarg = Math.sin(prot)*pspeed*timeScale;
+					if(pyvel < -1*Math.cos(prot)*pspeed*timeScale){
+						pyvel += pacc;
+					} else if (pyvel > -1*Math.cos(prot)*pspeed*timeScale){
+						pyvel -= pacc;
+					}
+					if(pxvel < Math.sin(prot)*pspeed*timeScale){
+						pxvel += pacc;
+					} else if (pxvel > Math.sin(prot)*pspeed*timeScale){
+						pxvel -= pacc;
+					}
+					
 					
 				}
 				if(keys[83]){
-					pyvel = Math.cos(prot)*pspeed*timeScale;
-					pxvel = -1*Math.sin(prot)*pspeed*timeScale;
+					yveltarg = Math.cos(prot)*pspeed*timeScale;
+					xveltarg = -1*Math.sin(prot)*pspeed*timeScale;
+					if(pyvel < Math.cos(prot)*pspeed*timeScale){
+						pyvel += pacc;
+					} else if (pyvel > Math.cos(prot)*pspeed*timeScale){
+						pyvel -= pacc;
+					}
+					if(pxvel < -1*Math.sin(prot)*pspeed*timeScale){
+						pxvel += pacc;
+					} else if (pxvel > -1*Math.sin(prot)*pspeed*timeScale){
+						pxvel -= paccr;
+					}
+					
 				}
 				if(keys[68]){
 					prot+=protvel*timeScale;
@@ -238,8 +263,10 @@
 				}
 				if(keys[32]){
 					protvel = protvelc*1.25;
+					friction = 0.2;
 				} else {
 					protvel = protvelc;
+					friction = 0.075;
 				}
 				if(keys[81] && movePage == ''){
 					movePage = 'left';
@@ -271,8 +298,22 @@
 					py-=pyvel;
 					px-=pxvel;
 				}
-				pyvel = 0;
-				pxvel = 0;
+				if(pxvel > 0){
+					pxvel -= friction;
+				} else if(pxvel < 0){
+					pxvel += friction;
+				}
+				if(Math.abs(pxvel) < friction){
+					pxvel = 0;
+				}
+				if(pyvel > 0){
+					pyvel -= friction;
+				} else if(pxvel < 0){
+					pyvel += friction;
+				}
+				if(Math.abs(pyvel) < friction){
+					pyvel = 0;
+				}
 			}
 			
 		}
@@ -415,13 +456,7 @@
 			
 			
 			this.think = function(){
-				if(this.t==false){
-					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
-					this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
-					this.hurt();
-					if(!(this.x > 0 || this.x <= 0)){
-						tanks.splice(this.p, 1);
-					}
+				if(this.t == false){
 					this.getP();
 					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
 					this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
@@ -432,89 +467,64 @@
 					if(!this.formation){
 						this.targ = new Point(px, py);
 					}
-				
+					
 					this.swarm();
 					if(!this.blocked){
 						if(!this.formation){
-							this.targ = new Point(px, py);
-						}
-						
-						this.swarm();
-						if(!this.blocked){
-							if(!this.formation){
-								if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
-									this.x += Math.cos(this.rot)*this.speed*timeScale;
-									this.y += Math.sin(this.rot)*this.speed*timeScale;
-								}
+							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
+								this.x += Math.cos(this.rot)*this.speed*timeScale;
+								this.y += Math.sin(this.rot)*this.speed*timeScale;
 							}
-							else {
-								if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
-									this.x += Math.cos(this.rot)*this.speed*timeScale;
-									this.y += Math.sin(this.rot)*this.speed*timeScale;
-								}
+						} else {
+							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
+								this.x += Math.cos(this.rot)*this.speed*timeScale;
+								this.y += Math.sin(this.rot)*this.speed*timeScale;
 							}
-							this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
-							this.tempPath = false;
 						}
-
 						this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
 						this.tempPath = false;
 					}
 					
-						if(this.blocked && !this.tempPath){// && !this.inWall){
+					if(this.blocked && !this.tempPath){// && !this.inWall){
+						
+							this.pathFind();
 							
-								this.pathFind();
-								
-						}
 						
-						//console.log(this.tempPath + ", "+this.blocked);
 						
-
-						//////console.log(this.blocked+", "+this.tempPath);
-						if(this.tempPath){
-								if(!this.blocked){
-									this.x += Math.cos(this.rot)*this.speed*timeScale;
-									this.y += Math.sin(this.rot)*this.speed*timeScale;
-								}
-							
-							if(this.pathTimer == 0){
-								this.pathFind();
-							}
-							if(this.pathTimer > 0){
-								this.pathTimer-=timeScale;
-							}
-
-						
-						}
+					}
 					//console.log(this.tempPath + ", "+this.blocked);
 					
 					//////console.log(this.blocked+", "+this.tempPath);
-						if(this.tempPath){
-								
-							this.x += Math.cos(this.rot)*this.speed*timeScale;
-							this.y += Math.sin(this.rot)*this.speed*timeScale;
-								
-						}
+					if(this.tempPath){
+							
+								this.x += Math.cos(this.rot)*this.speed*timeScale;
+								this.y += Math.sin(this.rot)*this.speed*timeScale;
+							
+						
 						if(this.pathTimer == 0){
 							this.pathFind();
 						}
+						if(this.pathTimer > 0){
+							this.pathTimer-=timeScale;
+						}
 					}
-					
-					if(this.rot > this.srot){
-						this.srot+=this.turnVel*timeScale;
-					}
-					if(this.rot < this.srot){
-						this.srot-=this.turnVel*timeScale;
-					}
-					if(Math.abs(this.rot-this.srot) < this.turnVel*timeScale){
-						this.srot = this.rot;
-					}
-					
-					
-					this.prev = [this.x, this.y, this.rot];
 				}
-					
-			
+				else{
+					this.hurt();
+				}
+				
+				if(this.rot > this.srot){
+					this.srot+=this.turnVel*timeScale;
+				}
+				if(this.rot < this.srot){
+					this.srot-=this.turnVel*timeScale;
+				}
+				if(Math.abs(this.rot-this.srot) < this.turnVel*timeScale){
+					this.srot = this.rot;
+				}
+				
+				
+				this.prev = [this.x, this.y, this.rot];
 			}
 			
 			this.swarm = function(){
@@ -709,6 +719,9 @@
 			
 			
 		};
+
+
+
 		
 		function Shell(x, y, vx, vy, rota, target, play){
 			this.vx = vx;
@@ -974,7 +987,7 @@
 		//var ap = new AmmoPack(300, 400);
 		var drawGame = function(){
 			
-			w.x++;
+			//w.x++;
 			
 			background(255, 255, 255);
 			for(t = 0; t < ammoPacks.length; t++){
@@ -1155,9 +1168,9 @@
 			
 		}
 		var levelPanels = [];
-		for(u = 0; u < 15; u++){
-			levelPanels.push(new LevelPanel(u, tanks.length, 10, tanks, levelOne, ));
-		}
+		
+		levelPanels[0] = new LevelPanel(0, 1, 0, levels[0][0], levels[0][1], levels[0][2], 50, 225);
+		
 		
 		function LevelPanel(num, tankNum, ammoNum, tankList, wallList, ammoList){
 			this.num = num;
