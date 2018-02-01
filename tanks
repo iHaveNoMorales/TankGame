@@ -21,17 +21,21 @@
 		var prot = 0;
 		var preload = 0;
 		var preloadc = 40;
-		var pspeed = 5;
+		var pspeed = 10;
 		var pyvel = 0;
 		var pxvel = 0;
+		var yveltarg = 0;
+		var xveltarg = 0;
+		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 100;
+		var pmaxhealth = 10000;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
 		var fc = 0;
 		var ammo = 10;
 		var movePage = '';
+		var friction = 0.05;
 		
 		
 		var timeScale = 1;
@@ -73,7 +77,7 @@
 		var aPack = new Image();
 		var numTanks = 14; 
 		
-		var screen = 3;
+		var screen = 0;
 		
 		var mouseX;
 		var mouseY;
@@ -220,13 +224,35 @@
 			if(phealth>0){ //tank doesn't move after death
 			
 				if(keys[87]){
-					pyvel = -1*Math.cos(prot)*pspeed*timeScale;
-					pxvel = Math.sin(prot)*pspeed*timeScale;
+					yveltarg = -1*Math.cos(prot)*pspeed*timeScale;
+					xveltarg = Math.sin(prot)*pspeed*timeScale;
+					if(pyvel < -1*Math.cos(prot)*pspeed*timeScale){
+						pyvel += pacc;
+					} else if (pyvel > -1*Math.cos(prot)*pspeed*timeScale){
+						pyvel -= pacc;
+					}
+					if(pxvel < Math.sin(prot)*pspeed*timeScale){
+						pxvel += pacc;
+					} else if (pxvel > Math.sin(prot)*pspeed*timeScale){
+						pxvel -= pacc;
+					}
+					
 					
 				}
 				if(keys[83]){
-					pyvel = Math.cos(prot)*pspeed*timeScale;
-					pxvel = -1*Math.sin(prot)*pspeed*timeScale;
+					yveltarg = Math.cos(prot)*pspeed*timeScale;
+					xveltarg = -1*Math.sin(prot)*pspeed*timeScale;
+					if(pyvel < Math.cos(prot)*pspeed*timeScale){
+						pyvel += pacc;
+					} else if (pyvel > Math.cos(prot)*pspeed*timeScale){
+						pyvel -= pacc;
+					}
+					if(pxvel < -1*Math.sin(prot)*pspeed*timeScale){
+						pxvel += pacc;
+					} else if (pxvel > -1*Math.sin(prot)*pspeed*timeScale){
+						pxvel -= paccr;
+					}
+					
 				}
 				if(keys[68]){
 					prot+=protvel*timeScale;
@@ -237,8 +263,10 @@
 				}
 				if(keys[32]){
 					protvel = protvelc*1.25;
+					friction = 0.2;
 				} else {
 					protvel = protvelc;
+					friction = 0.075;
 				}
 				if(keys[81] && movePage == ''){
 					movePage = 'left';
@@ -270,8 +298,22 @@
 					py-=pyvel;
 					px-=pxvel;
 				}
-				pyvel = 0;
-				pxvel = 0;
+				if(pxvel > 0){
+					pxvel -= friction;
+				} else if(pxvel < 0){
+					pxvel += friction;
+				}
+				if(Math.abs(pxvel) < friction){
+					pxvel = 0;
+				}
+				if(pyvel > 0){
+					pyvel -= friction;
+				} else if(pxvel < 0){
+					pyvel += friction;
+				}
+				if(Math.abs(pyvel) < friction){
+					pyvel = 0;
+				}
 			}
 			
 		}
