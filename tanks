@@ -53,6 +53,8 @@
 		var levelOne = [new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25)];
 		var ammoPacks = [new AmmoPack(400, 400)];
 		
+		var tutorial = [new Tank (800, 225, 0, true), new Wall(150,150, 25, 200), new AmmoPack(200, 225)]; //tank, wall, ammo packs
+		
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
 		var enemyCannon = new Image();
@@ -251,7 +253,11 @@
 		
 		}
 		
-		function Tank(x, y, p){
+		function Tank(x, y, p, t){
+			this.t=t;
+			if(this.t==undefined){
+				t=false;
+			}
 			this.x = x;
 			this.y = y;
 			this.rot = 0;
@@ -353,71 +359,71 @@
 			
 			
 			this.think = function(){
-				this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
-				this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
-				this.hurt();
-				if(!(this.x > 0 || this.x <= 0)){
-					tanks.splice(this.p, 1);
-				}
-				if(!this.formation){
-					this.targ = new Point(px, py);
-				}
-				
-				this.swarm();
-				if(!this.blocked){
+				if(this.t==false){
+					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
+					this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+					this.hurt();
+					if(!(this.x > 0 || this.x <= 0)){
+						tanks.splice(this.p, 1);
+					}
 					if(!this.formation){
-						if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
-							this.x += Math.cos(this.rot)*this.speed*timeScale;
-							this.y += Math.sin(this.rot)*this.speed*timeScale;
-						}
-					} else {
-						if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
-							this.x += Math.cos(this.rot)*this.speed*timeScale;
-							this.y += Math.sin(this.rot)*this.speed*timeScale;
-						}
+						this.targ = new Point(px, py);
 					}
-					this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
-					this.tempPath = false;
-				}
-				
-				if(this.blocked && !this.tempPath && !this.inWall){
 					
-						this.pathFind();
+					this.swarm();
+					if(!this.blocked){
+						if(!this.formation){
+							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 80){
+								this.x += Math.cos(this.rot)*this.speed*timeScale;
+								this.y += Math.sin(this.rot)*this.speed*timeScale;
+							}
+						} else {
+							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 2){
+								this.x += Math.cos(this.rot)*this.speed*timeScale;
+								this.y += Math.sin(this.rot)*this.speed*timeScale;
+							}
+						}
+						this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
+						this.tempPath = false;
+					}
+					
+					if(this.blocked && !this.tempPath && !this.inWall){
 						
+							this.pathFind();
+							
+						
+						
+					}
+					//console.log(this.tempPath + ", "+this.blocked);
 					
-					
-				}
-				//console.log(this.tempPath + ", "+this.blocked);
-				
-				//////console.log(this.blocked+", "+this.tempPath);
-				if(this.tempPath){
-						if(!this.blocked){
-							this.x += Math.cos(this.rot)*this.speed*timeScale;
-							this.y += Math.sin(this.rot)*this.speed*timeScale;
+					//////console.log(this.blocked+", "+this.tempPath);
+					if(this.tempPath){
+							if(!this.blocked){
+								this.x += Math.cos(this.rot)*this.speed*timeScale;
+								this.y += Math.sin(this.rot)*this.speed*timeScale;
+							}
+						
+						if(this.pathTimer == 0){
+							this.pathFind();
 						}
-					
-					if(this.pathTimer == 0){
-						this.pathFind();
+						if(this.pathTimer > 0){
+							this.pathTimer-=timeScale;
+						}
 					}
-					if(this.pathTimer > 0){
-						this.pathTimer-=timeScale;
+					if(this.rot > this.srot){
+						this.srot+=this.turnVel*timeScale;
 					}
-				}
-				if(this.rot > this.srot){
-					this.srot+=this.turnVel*timeScale;
-				}
-				if(this.rot < this.srot){
-					this.srot-=this.turnVel*timeScale;
-				}
-				if(Math.abs(this.rot-this.srot) < this.turnVel*timeScale){
-					this.srot = this.rot;
-				}
-				
-				
-				this.prev = [this.x, this.y, this.rot];
-				
+					if(this.rot < this.srot){
+						this.srot-=this.turnVel*timeScale;
+					}
+					if(Math.abs(this.rot-this.srot) < this.turnVel*timeScale){
+						this.srot = this.rot;
+					}
 					
-				
+					
+					this.prev = [this.x, this.y, this.rot];
+				}
+					
 			
 			}
 			
