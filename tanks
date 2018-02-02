@@ -8,9 +8,27 @@
 			border:1px solid black;
 			float:left;
 		}
+	
+	
+	@font-face {
+	  font-family: 'GameFont';
+	  font-style: normal;
+	  font-weight: 400;
+	  src: local('Black Ops One Regular'), local('BlackOpsOne-Regular'), url(font3.woff2) format('woff2');
+	  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+	}
+	/* latin */
+	@font-face {
+	  font-family: 'GameFont';
+	  font-style: normal;
+	  font-weight: 400;
+	  src: local('Black Ops One Regular'), local('BlackOpsOne-Regular'), url(font3.woff2) format('woff2');
+	  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+	}
 	</style>
   </head>
   <body>
+  <span style="font-family: 'GameFont', cursive;"></span>
 	<canvas width="900" height="500" id="can"></canvas>
 	<input type="text" id="input">
 	<script>
@@ -22,7 +40,7 @@
 		
 		var preloadc = 40;
 		var preload = preloadc;
-		var pspeed = 10;
+		var pspeed = 5;
 		var pyvel = 0;
 		var pxvel = 0;
 		var yveltarg = 0;
@@ -37,6 +55,8 @@
 		var ammo = 10;
 		var movePage = '';
 		var friction = 0.05;
+		var lvlX = 0;
+		var lvlY = 0;
 		
 		
 		var timeScale = 1;
@@ -59,8 +79,9 @@
 
 		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225)]]; //tank, wall, ammo packs
 		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
-
-		var levels = [tutorial, levelOne]; //tank wall ammo
+		var levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)]]
+		
+		var levels = [tutorial, levelOne, levelTwo]; //tank wall ammo
 		
 		
 		var ammoPacks = [new AmmoPack(400, 400)];
@@ -78,7 +99,7 @@
 		var aPack = new Image();
 		var numTanks = 14; 
 		
-		var screen = 3;
+		var screen = 0;
 
 		var mouseX;
 		var mouseY;
@@ -248,12 +269,12 @@
 					protvel = protvelc;
 					friction = 0.075;
 				}
-				if(keys[81] && movePage == ''){
+				if(keys[81] && movePage == '' && pageOn > 0){
 					movePage = 'left';
 					tempPage = pageOn;
 					
 				}
-				if(keys[69] && movePage == ''){
+				if(keys[69] && movePage == '' && pageOn < Math.floor(levelPanels.length/panelPerPage)){
 					movePage = 'right';
 					tempPage = pageOn;
 				}
@@ -272,28 +293,17 @@
 					}
 				}
 				
-				py+=pyvel;
-				px+=pxvel;
+					py+=pyvel;
+					px+=pxvel;
+				
+				
+				
 				if(pInWall()){
 					py-=pyvel;
 					px-=pxvel;
 				}
-				if(pxvel > 0){
-					pxvel -= friction;
-				} else if(pxvel < 0){
-					pxvel += friction;
-				}
-				if(Math.abs(pxvel) < friction){
-					pxvel = 0;
-				}
-				if(pyvel > 0){
-					pyvel -= friction;
-				} else if(pxvel < 0){
-					pyvel += friction;
-				}
-				if(Math.abs(pyvel) < friction){
-					pyvel = 0;
-				}
+				pxvel = 0;
+				pyvel = 0;
 			}
 			
 		}
@@ -317,9 +327,9 @@
 		}
 		
 		function Tank(x, y, p, t){
-			this.t=t;
-			if(this.t==undefined){
-				t=false;
+			this.t = t;
+			if(this.t == undefined){
+				this.t = false;
 			}
 			this.x = x;
 			this.y = y;
@@ -439,7 +449,9 @@
 				if(this.t == false){
 					this.getP();
 					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
-					this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+					if(!this.tempPath){
+						this.shoot(Math.atan2(this.shotTarg.y-this.y, this.shotTarg.x-this.x));
+					}
 					this.hurt();
 					if(!(this.x > 0 || this.x <= 0)){
 						tanks.splice(this.p, 1);
@@ -743,7 +755,7 @@
 					this.explode();
 				}
 				if(!play){
-					if((dist(this.x, this.y, this.target.x, this.target.y) < 20 && this.exploding == 0) || (this.distance > 2500 && this.exploding == 0)){
+					if((dist(this.x, this.y, this.target.x, this.target.y) < 35 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
 						this.exploding = 1;
 						//console.log(this.exploding);
 					}
@@ -752,7 +764,7 @@
 						this.exploding=1;
 					}
 					for(o = 0; o < tanks.length; o++){
-						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 20 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
+						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 35 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
 							this.exploding = 1;
 							break;
 							//console.log(this.exploding);
@@ -907,9 +919,16 @@
 			if(precover > 0){
 				precover-=timeScale;
 			}
-			for(f = 0; f < ammo; f++){
+			/*for(f = 0; f < ammo; f++){
 				cx.drawImage(pShot, 5+((f)*12), 25, 10, 10);
-			}
+			}*/
+			cx.fillStyle = 'rgb(130, 130, 130)';
+			cx.fillRect(5, 35, 75, 20);
+			cx.fillStyle = "black";
+			cx.font = '10px GameFont';
+			cx.textAlign = "left";
+			
+			cx.fillText("Ammo: "+ammo, 5, 50);
 			//console.log(phealth);
 		
 			
@@ -1079,7 +1098,7 @@
 			if(loadAni == 0){
 				screen = 1;
 			}
-			cx.font = 'italic 40px Arial';
+			cx.font = '40px GameFont';
 			cx.fillStyle = 'rgb(50, 0, 0)';
 			cx.textAlign = 'center';
 			cx.fillText('Tanks', 450, 200);
@@ -1128,7 +1147,7 @@
 					cx.fillStyle = offcolor;
 				}
 				cx.fillRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
-				cx.font = 'bold '+this.fontSize+'px Arial';
+				cx.font = 'bold '+this.fontSize+'px GameFont';
 				cx.fillStyle = 'rgb(0, 0, 0)';
 				cx.textAlign = 'center';
 				cx.fillText('Play', x, y+this.h/5);
@@ -1147,9 +1166,23 @@
 			
 			
 		}
+		var panelPerPage = 3;
+		var buffer = 25;
+		var panelW = (5*(900/panelPerPage))/6;
+		var sideBuffer = (900-((panelW*panelPerPage)+((panelPerPage-1)*buffer)))/2
+		var panelH = 350;
+		
+		
 		var levelPanels = [];
+		var pos = 0;
 
-		levelPanels[0] = new LevelPanel(0, 1, 0, levels[0][0], levels[0][1], levels[0][2], 50, 225);
+		levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], 50, 225);
+		pos = 1;
+		levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], 200, 200);
+		pos = 2;
+		levelPanels[pos] = new LevelPanel(pos, 8, 20, levels[pos][0], levels[pos][1], levels[pos][2], 200, 200);
+		
+		
 		
 		function LevelPanel(num, tankNum, ammoNum, tankList, wallList, ammoList, psx, psy){
 			this.num = num;
@@ -1169,27 +1202,24 @@
 			this.x = 0;
 			this.y = 0;
 			this.page = 0;
-			this.b; new Button(this)
+			this.b; 
 			this.draw = function(){
 				this.b = new Button(this.x+(-900*pageOn), this.y+100, 75, 25, this.playLevel, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 15)
-				if(this.num%10 < 5){
-					this.y = 75;
-				} else {
-					this.y = 275;
-				}
+				
+				this.y = 75;
 				cx.save();
 				cx.translate(-900*pageOn, 0);
 				//console.log(-900*pageOn);
-				this.page = Math.floor(this.num/10);
+				this.page = Math.floor(this.num/panelPerPage);
 				
-				this.x = 150+((num%5)*150)+(this.page*900);
+				this.x = (sideBuffer+(panelW/2)+((this.num%panelPerPage)*((panelW)+buffer)))+(this.page*900);
 				cx.fillStyle = 'rgb(0, 130, 255)';
 				
-		
-				cx.fillRect(this.x-50, this.y, 100, 150);
+				console.log(this.x);
+				cx.fillRect(this.x-panelW/2, this.y, panelW, panelH);
 				
 				cx.fillStyle = "black";
-				cx.font = '20px Arial';
+				cx.font = '20px GameFont';
 				cx.textAlign = "center";
 				if(num == 0){
 					cx.fillText("Tutorial", this.x, this.y+40);
@@ -1240,17 +1270,21 @@
 			if(screen == 1){
 				menu();
 				
+				
 			}
 			if(screen == 2){
 			
 				drawGame();
 				cx.fillStyle = 'rgb(0, 0, 0)';
 			cx.fillText(mouseX+", "+mouseY, 50, 460);
+			console.log(tanks[0].t);
 			
 			}
 			if(screen == 3){
 				levelSelect();
 				keyControl();
+				cx.fillStyle = 'rgb(0, 0, 0)';
+			cx.fillText(mouseX+", "+mouseY, 50, 460);
 			
 			}
 		}
