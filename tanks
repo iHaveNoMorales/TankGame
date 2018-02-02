@@ -22,14 +22,14 @@
 		
 		var preloadc = 40;
 		var preload = preloadc;
-		var pspeed = 10;
+		var pspeed = 5;
 		var pyvel = 0;
 		var pxvel = 0;
 		var yveltarg = 0;
 		var xveltarg = 0;
 		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 10000;
+		var pmaxhealth = 50;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
@@ -56,16 +56,13 @@
 		
 		var shells = [];
 		
-
-		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225)]]; //tank, wall, ammo packs
+		var lvl = 0;
+		
+		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)]]; //tank, wall, ammo packs
 		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
-
+		
 		var levels = [tutorial, levelOne]; //tank wall ammo
 		
-		
-		var ammoPacks = [new AmmoPack(400, 400)];
-		
-
 
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
@@ -278,22 +275,8 @@
 					py-=pyvel;
 					px-=pxvel;
 				}
-				if(pxvel > 0){
-					pxvel -= friction;
-				} else if(pxvel < 0){
-					pxvel += friction;
-				}
-				if(Math.abs(pxvel) < friction){
-					pxvel = 0;
-				}
-				if(pyvel > 0){
-					pyvel -= friction;
-				} else if(pxvel < 0){
-					pyvel += friction;
-				}
-				if(Math.abs(pyvel) < friction){
-					pyvel = 0;
-				}
+				pxvel = 0;
+				pyvel = 0;
 			}
 			
 		}
@@ -319,7 +302,7 @@
 		function Tank(x, y, p, t){
 			this.t=t;
 			if(this.t==undefined){
-				t=false;
+				this.t=false;
 			}
 			this.x = x;
 			this.y = y;
@@ -970,6 +953,11 @@
 			//w.x++;
 			
 			background(255, 255, 255);
+			
+			if(lvl == 0){
+				cx.fillText("Move with wasd", 0, 200);
+			}
+			
 			for(t = 0; t < ammoPacks.length; t++){
 				ammoPacks[t].act();
 				if(ammoPacks[t].pickedUp()){
@@ -1202,7 +1190,6 @@
 			}
 			this.playLevel = function(){
 				
-				
 				tanks = levels[num][0];
 				gameObjects = levels[num][1];
 				ammoPacks = levels[num][2];
@@ -1213,6 +1200,7 @@
 				ammo = ammoNum;
 				ammoc = ammoNum;
 				screen = 2;
+				lvl = num;
 				
 			}
 			
@@ -1224,6 +1212,7 @@
 				levelPanels[v].draw();
 				//console.log(levelPanels[v]);
 			}
+			console.log;
 			
 		}
 		
