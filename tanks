@@ -38,7 +38,7 @@
 		var cx = canvas.getContext("2d");
 		var prot = 0;
 		
-		var preloadc = 40;
+		var preloadc = 65;
 		var preload = preloadc;
 		var pspeed = 5;
 		var pyvel = 0;
@@ -47,7 +47,7 @@
 		var xveltarg = 0;
 		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 50;
+		var pmaxhealth = 100;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
@@ -57,6 +57,12 @@
 		var friction = 0.05;
 		var lvlX = 0;
 		var lvlY = 0;
+		var levelCompleted = false;
+		
+		var lvlsPassed = localStorage.getItem('lvlsPassed');
+		if(lvlsPassed == undefined){
+			lvlsPassed = 0;
+		}
 		
 		
 		var timeScale = 1;
@@ -76,22 +82,18 @@
 		
 		var shells = [];
 		
-<<<<<<< HEAD
 
-		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225)]]; //tank, wall, ammo packs
-		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
-		var levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)]]
+
+		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], []]; 
+		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)], [new HealthPack(450, 450)]];
+		var levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 		
-		var levels = [tutorial, levelOne, levelTwo]; //tank wall ammo
-=======
+		var levels = [tutorial, levelOne, levelTwo]; //tank wall ammo health
+
 		var lvl = 0;
->>>>>>> 4c9daa6b864d5d4764f490e25660314989073ffb
-		
-		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)]]; //tank, wall, ammo packs
-		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)]];
-		
-		var levels = [tutorial, levelOne]; //tank wall ammo
-		
+ //tank wall ammo
+		var ammoPacks = [];
+		var healthPacks = [];
 
 		var gameObjects = levelOne;
 		var enemyBase = new Image();
@@ -104,7 +106,7 @@
 		var aPack = new Image();
 		var numTanks = 14; 
 		
-		var screen = 0;
+		var screen = 3;
 
 		var mouseX;
 		var mouseY;
@@ -248,7 +250,7 @@
 		var tempPage;
 		function keyControl(){
 			
-			if(phealth>0){ //tank doesn't move after death
+			if(phealth>0 && !levelCompleted){ //tank doesn't move after death
 			
 				if(keys[87]){
 					pyvel = -1*Math.cos(prot)*pspeed*timeScale;
@@ -332,15 +334,10 @@
 		}
 		
 		function Tank(x, y, p, t){
-<<<<<<< HEAD
+
 			this.t = t;
 			if(this.t == undefined){
 				this.t = false;
-=======
-			this.t=t;
-			if(this.t==undefined){
-				this.t=false;
->>>>>>> 4c9daa6b864d5d4764f490e25660314989073ffb
 			}
 			this.x = x;
 			this.y = y;
@@ -359,8 +356,6 @@
 			this.reload = 65;
 			this.reloading = Math.floor(Math.random()*this.reload);
 			
-			
-			
 			this.prev = [this.x, this.y, this.rot];
 			this.xvel = 0;
 			this.yvel = 0;
@@ -369,7 +364,7 @@
 			this.recoverc = 50;
 			this.recover = this.recoverc;
 
-			this.maxhealth = 25;
+			this.maxhealth = 5;
 			this.health = this.maxhealth;
 			this.inWall = false;
 			
@@ -715,7 +710,7 @@
 			this.act = function(){
 				
 				this.draw();
-				if(phealth>0){
+				if(phealth>0 && !levelCompleted){
 					this.think(); //stops enemies from shooting dead player
 				}
 			}
@@ -879,7 +874,7 @@
 			cx.closePath();
 			//cx.fillRect(-25, -25, 50, 50);
 			cx.restore();
-			if(clicked && preload == 0 && ammo > 0){
+			if(clicked && preload == 0 && ammo > 0 && !levelCompleted){
 				temps = new Shell(px, py, Math.cos(cannonRot)*10, Math.sin(cannonRot)*10, cannonRot, new Point(-200, -200), true);
 				shells.push(temps);
 				preload = preloadc;
@@ -891,32 +886,33 @@
 			targRot = (Math.atan2(mouseY-py, mouseX-px)+Math.PI*2);
 			var canRotSpeed = 0.08;
 			//cannonRot %= (Math.PI*2);
-			
-			if(cannonRot > targRot){
-				if((Math.abs(cannonRot-(Math.PI*3)) + Math.abs(targRot-Math.PI)) < cannonRot-targRot){
-					cannonRot+=canRotSpeed*timeScale;
-				} else {
-					cannonRot -= canRotSpeed*timeScale;
+			if(!levelCompleted){
+				if(cannonRot > targRot){
+					if((Math.abs(cannonRot-(Math.PI*3)) + Math.abs(targRot-Math.PI)) < cannonRot-targRot){
+						cannonRot+=canRotSpeed*timeScale;
+					} else {
+						cannonRot -= canRotSpeed*timeScale;
+					}
+				} else if (cannonRot < targRot){
+					if((Math.abs(targRot - (Math.PI*3)) + Math.abs(cannonRot - Math.PI)) < targRot - cannonRot){
+						cannonRot-=canRotSpeed*timeScale;
+					} else {
+						cannonRot += canRotSpeed*timeScale;
+					}
 				}
-			} else if (cannonRot < targRot){
-				if((Math.abs(targRot - (Math.PI*3)) + Math.abs(cannonRot - Math.PI)) < targRot - cannonRot){
-					cannonRot-=canRotSpeed*timeScale;
-				} else {
-					cannonRot += canRotSpeed*timeScale;
+				
+				if(cannonRot > Math.PI*3){
+					cannonRot %= (Math.PI*2);
+				}
+				if(cannonRot < Math.PI){
+					cannonRot += (Math.PI*2);
+				}
+				
+				if(Math.abs(cannonRot-targRot) < canRotSpeed*timeScale){
+					cannonRot = targRot;
 				}
 			}
 			
-			if(cannonRot > Math.PI*3){
-				cannonRot %= (Math.PI*2);
-			}
-			if(cannonRot < Math.PI){
-				cannonRot += (Math.PI*2);
-			}
-			
-			if(Math.abs(cannonRot-targRot) < canRotSpeed*timeScale){
-				cannonRot = targRot;
-			}
-			cx.fillText(cannonRot+", "+targRot, 300, 300);
 			for(q = 0; q < shells.length; q++){
 				if(shells[q].exploding == 1){
 					if(dist(shells[q].x, shells[q].y, px, py) <= shells[q].rad && precover == 0){
@@ -970,6 +966,36 @@
 			}
 		}
 		
+		function HealthPack(x, y){
+			this.x = x;
+			this.y = y;
+			this.w = 30;
+			this.h = 30;
+			this.draw = function(){
+				cx.fillStyle = 'rgb(255, 0, 0)';
+				cx.fillRect(this.x, this.y, this.w, this.h);
+				//cx.drawImage(hPack, this.x, this.y, this.w, this.h);
+			}
+			
+			this.pickedUp = function(){
+				if (px - 25 < this.x + this.w &&
+				px + 25 > this.x &&
+				py - 25 < this.y + this.h &&
+				py + 25 > this.y ){
+					return true;
+				}
+			}
+			this.act = function(){
+				if(this.pickedUp()){
+					phealth+=10;
+				}
+				if(phealth > pmaxhealth){
+					phealth = pmaxhealth;
+				}
+				this.draw();
+			}
+		}
+		
 		
 		var healthbar = function(){
 			cx.fillStyle = 'rgba(0, 0, 0, 0)';
@@ -994,15 +1020,16 @@
 			}
 			cx.fillRect(5, 5, (phealth/pmaxhealth)*100, 10);
 		}
-		//var ap = new AmmoPack(300, 400);
+		
 		var drawGame = function(){
-			
-			//w.x++;
 			
 			background(255, 255, 255);
 			
 			if(lvl == 0){
-				cx.fillText("Move with wasd", 0, 200);
+				cx.fillStyle = "black";
+				cx.font = '20px GameFont';
+				cx.textAlign = 'center';
+				cx.fillText("Move with WASD", 450, 150);
 			}
 			
 			for(t = 0; t < ammoPacks.length; t++){
@@ -1012,42 +1039,30 @@
 					t--;
 				}
 			}
-			healthbar();
-			textVal = document.getElementById("input").value;
-			if(textVal < tanks.length){
-				if(textVal > 0){
-					//console.log((tanks[textVal].x > 0 || tanks[textVal].x <=0));
+			for(t = 0; t < healthPacks.length; t++){
+				healthPacks[t].act();
+				if(healthPacks[t].pickedUp()){
+					healthPacks.splice(t, 1);
+					t--;
 				}
 			}
-			//////console.log(tanks[1].x+", "+tanks[1].y);
+			healthbar();
 			
 			for(k = 0; k < gameObjects.length; k++){
 				gameObjects[k].draw();
 			}
 			for(h = 0; h < tanks.length; h++){
 				tanks[h].act(); 
-				//console.log(tanks.length+", "+h);
+				
 				if(tanks[h].health <= 0){
 					tanks.splice(h, 1);
 					if(tanks.length > 0){
 						h--;
 					}
-					
 				}
-				
-				
 			}
 			
-			
 			for(k = 0; k < shells.length; k++){
-			
-				//console.log(typeof(shells[k])+", "+shells[k].rad+", "+shells[k].exploding);
-				
-				
-				//console.log(typeof(shells[k]));
-				
-				
-				
 				shells[k].act();
 				if(shells[k].exploding == -1){
 					shells.splice(k, 1);
@@ -1057,17 +1072,10 @@
 					}
 					
 				}
-				
-				
-				
-				//console.log(typeof(shells[k]));
-				
-				
-				
-				
 			}
 			
-			//////console.log(tanks.length);
+			
+			
 			if(phealth > 0){
 				player();
 			}
@@ -1075,18 +1083,13 @@
 			if(enemyForm){
 				if(form == 'circle'){
 					for(k = 0; k < tanks.length; k++){
-						//cx.fillStyle = "black";
-						//cx.fillRect(px+(100*(Math.cos(2*Math.PI*((k)/tanks.length)))), py+(100*(Math.sin(2*Math.PI*((k)/tanks.length)))), 5, 5);
-						
-						
 						tanks[k].targ = new Point(px+100*(Math.cos(2*Math.PI*((k)/tanks.length))), py+100*(Math.sin(2*Math.PI*((k)/tanks.length))));
 					}
 				}
 				if(form == 'v'){
 					cons = 50;
 					for(k = -1*(tanks.length/2)+1; k < (tanks.length/2); k++){
-						////console.log("yeee");
-						//if(k > tanks.length/2){
+						
 							cx.fillStyle = "black";
 							cx.save();
 							cx.translate(px, py);
@@ -1095,17 +1098,41 @@
 							
 							cx.restore();
 							tanks[k+tanks.length/2].targ = new Point(px+k*cons, py+(-1*Math.abs(k*cons))+100);
-						/*} else {
-							
-						}*/
 					}
 					tanks[0].targ = new Point(px, 100+py+cons/2);
 				}
 			}
-			////console.log(form);
+			if(!levelCompleted && tanks.length == 0){
+				lvlsPassed++;
+				localStorage.setItem("lvlsPassed", lvlsPassed);
+				levelCompleted = true;
+			}
+			if(levelCompleted){
+				levelFinished(lvl);
+			}
 			
 			fc++;
 		}
+		
+		var levelFinished = function(number){
+			background2(0, 0, 0, 0.3);
+			cx.fillStyle = 'rgb(0, 130, 255)';
+			cx.strokeStyle = 'rgb(255, 255, 255)';
+			
+			cx.fillRect(300, 50, 300, 400);
+			cx.strokeRect(300, 50, 300, 400);
+			cx.font = '25px GameFont';
+			cx.fillStyle = "black";
+			cx.textAlign = "center";
+			cx.fillText("Level Passed!", 450, 100);
+			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Menu", 15)).act();
+			(new Button(450, 250, 125, 50, function(){levelCompleted = false; screen = 3;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Level Select", 15)).act();
+			//(new Button(450, 325, 125, 50, function(){levelCompleted = false; levelPanels[lvl].playLevel();}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Replay", 15)).act();
+			
+			
+			
+		}
+		
 		var loadAni = 500;
 		function loading(){
 			background(255, 255, 255);
@@ -1151,6 +1178,7 @@
 			this.h = h;
 			this.fontSize = fontSize;
 			this.action = action;
+			this.name = name;
 			
 			this.act = function(){
 				if(mouseX > this.x-(this.w/2) && mouseX < this.x+(this.w/2) && mouseY > this.y-(this.h/2) && mouseY < this.y+(this.h/2)){
@@ -1166,7 +1194,8 @@
 				cx.font = 'bold '+this.fontSize+'px GameFont';
 				cx.fillStyle = 'rgb(0, 0, 0)';
 				cx.textAlign = 'center';
-				cx.fillText('Play', x, y+this.h/5);
+				cx.textBaseline = 'middle';
+				cx.fillText(this.name, x, y);
 				cx.strokeStyle = 'rgb(0, 0, 0)';
 				cx.strokeRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
 			}
@@ -1192,23 +1221,25 @@
 		var levelPanels = [];
 		var pos = 0;
 
-		levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], 50, 225);
+		levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 50, 225);
 		pos = 1;
-		levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], 200, 200);
+		levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
 		pos = 2;
-		levelPanels[pos] = new LevelPanel(pos, 8, 20, levels[pos][0], levels[pos][1], levels[pos][2], 200, 200);
+		levelPanels[pos] = new LevelPanel(pos, 8, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
 		
 		
 		
-		function LevelPanel(num, tankNum, ammoNum, tankList, wallList, ammoList, psx, psy){
+		function LevelPanel(num, tankNum, ammoNum, tankList, wallList, ammoList, healthList, psx, psy){
 			this.num = num;
 			this.tankNum = tankNum;
 			this.ammoNum = ammoNum;
 			this.tankList = tankList;
 			this.wallList = wallList;
 			this.ammoList = ammoList;
+			this.healthList = healthList;
 			this.psx = psx;
 			this.psy = psy;
+			this.panelC = 'rgb(0, 130, 255)';
 			if(this.psx == undefined || this.psy == undefined){
 				this.psx = 200;
 				this.psy = 200;
@@ -1220,7 +1251,7 @@
 			this.page = 0;
 			this.b; 
 			this.draw = function(){
-				this.b = new Button(this.x+(-900*pageOn), this.y+100, 75, 25, this.playLevel, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 15)
+				this.b = new Button(this.x+(-900*pageOn), this.y+200, 75, 25, this.playLevel, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 15)
 				
 				this.y = 75;
 				cx.save();
@@ -1229,21 +1260,40 @@
 				this.page = Math.floor(this.num/panelPerPage);
 				
 				this.x = (sideBuffer+(panelW/2)+((this.num%panelPerPage)*((panelW)+buffer)))+(this.page*900);
-				cx.fillStyle = 'rgb(0, 130, 255)';
+				cx.fillStyle = this.panelC;
 				
-				console.log(this.x);
+				
 				cx.fillRect(this.x-panelW/2, this.y, panelW, panelH);
 				
 				cx.fillStyle = "black";
-				cx.font = '20px GameFont';
+				cx.font = '30px GameFont';
 				cx.textAlign = "center";
 				if(num == 0){
 					cx.fillText("Tutorial", this.x, this.y+40);
 				} else {
 					cx.fillText(num, this.x, this.y+40);
 				}
+				cx.font = '12px GameFont';
+				cx.fillText("Ammo: "+this.ammoNum, this.x, this.y+150);
+				cx.fillText("Tanks: "+this.tankNum, this.x, this.y+175);
 				cx.restore();
-				this.b.act();
+				if(lvlsPassed >= this.num){
+					this.b.act();
+				} else {
+					cx.strokeStyle = "black";
+					cx.fillStyle = this.panelC;
+					cx.lineWidth = "4";
+					
+					circle(this.x, this.y+250, 15);
+					cx.lineWidth = "1";
+					cx.fillStyle = "black";
+					cx.fillRect(this.x-20, this.y+250, 40, 40);
+					cx.fillStyle = this.panelC;
+					cx.fillRect(this.x-3, this.y+270, 6, 10);
+					cx.strokeStyle = "rgba(0, 0, 0, 0)";
+					circle(this.x, this.y+268, 5);
+					
+				}
 				
 			}
 			this.playLevel = function(){
@@ -1251,6 +1301,7 @@
 				tanks = levels[num][0];
 				gameObjects = levels[num][1];
 				ammoPacks = levels[num][2];
+				healthPacks = levels[num][3];
 				console.log(this.psx+", "+this.psy);
 				px = psx;
 				py = psy;
@@ -1270,12 +1321,16 @@
 				levelPanels[v].draw();
 				//console.log(levelPanels[v]);
 			}
-			console.log;
+			console.log(lvlsPassed);
 			
 		}
 		
 		var background = function(r, g, b){
 			cx.fillStyle = 'rgb('+r+','+g+','+b+')';
+			cx.fillRect(0, 0, 900, 500);
+		}
+		var background2 = function(r, g, b, a){
+			cx.fillStyle = 'rgba('+r+','+g+','+b+','+a+')';
 			cx.fillRect(0, 0, 900, 500);
 		}
 		var screenFunction = function(){
@@ -1307,6 +1362,13 @@
 		}
 		setInterval(screenFunction, 20);
 		
+		function circle(x, y, r){
+			cx.beginPath();
+			cx.arc(x, y, r, 0, Math.PI * 2);
+			cx.fill();
+			cx.stroke();
+			cx.closePath();
+		}
 		
 		
 	</script>
