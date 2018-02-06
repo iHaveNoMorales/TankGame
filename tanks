@@ -58,8 +58,11 @@
 		var lvlX = 0;
 		var lvlY = 0;
 		var levelCompleted = false;
+		var clickDelayc = 13;
+		var clickDelay = 0;
 		
-		var lvlsPassed = localStorage.getItem('lvlsPassed');
+		//var lvlsPassed = localStorage.getItem('lvlsPassed');
+		var lvlsPassed = 3;
 		if(lvlsPassed == undefined){
 			lvlsPassed = 0;
 		}
@@ -82,14 +85,44 @@
 		
 		var shells = [];
 		
-
-
-		var tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], []]; 
-		var levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)], [new HealthPack(450, 450)]];
-		var levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 		
-		var levels = [tutorial, levelOne, levelTwo]; //tank wall ammo health
 
+
+		var tutorial;// = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], []]; 
+		var levelOne;// = [[new Tank(50, 50)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)], [new HealthPack(450, 450)]];//[[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)], [new HealthPack(450, 450)]];
+		var levelTwo;// = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
+		var levelThree;// = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
+		var levels;// = [tutorial, levelOne, levelTwo, levelThree]; //tank wall ammo health
+		
+		var levelPanels = [];
+		var pos = 0;
+		
+		
+		var currTheme = 0;
+		var themes = [['rgb(0, 130, 0)', 'rgb(38, 180, 38)', 'rgb(38, 210, 38)'], ['rgb(194, 178, 128)', 'rgb(219, 203, 153)', 'rgb(234, 218, 168)'],  ['rgb(130, 130, 130)', 'rgb(180, 180, 180)', 'rgb(210, 210, 210)'], ['rgb(101, 67, 33)',  'rgb(120, 88, 39)', 'rgb(139, 93, 46)',]];
+		var lvlPerCampaign = 1;
+		
+		initLevel();
+		function initLevel() {
+			tutorial = [[new Tank (800, 225, 0, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], []]; 
+			levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)], [new HealthPack(450, 450)]];
+			levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
+		    levelThree = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
+			
+			levels = [tutorial, levelOne, levelTwo, levelThree]; //tank wall ammo health
+			
+			levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 50, 225);
+			pos = 1;
+			levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
+			pos = 2;
+			levelPanels[pos] = new LevelPanel(pos, 8, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
+			pos = 3;
+			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 450, 250);
+		
+
+		}
+		
+		
 		var lvl = 0;
  //tank wall ammo
 		var ammoPacks = [];
@@ -106,7 +139,7 @@
 		var aPack = new Image();
 		var numTanks = 14; 
 		
-		var screen = 3;
+		var screen = 1;
 
 		var mouseX;
 		var mouseY;
@@ -125,7 +158,7 @@
 		
 		var clicked = false;
 		canvas.addEventListener("mousemove", getMouseCoords, false);
-		canvas.addEventListener("mousedown", function(event){clicked = true;}, false);
+		canvas.addEventListener("mousedown", function(event){if(clickDelay == 0){clicked = true; clickDelay = clickDelayc;}}, false);
 		canvas.addEventListener("mouseup", function(event){clicked = false;}, false);
 		
 		
@@ -256,6 +289,7 @@
 					pyvel = -1*Math.cos(prot)*pspeed*timeScale;
 					pxvel = Math.sin(prot)*pspeed*timeScale;
 					
+					
 				}
 				if(keys[83]){
 					pyvel = Math.cos(prot)*pspeed*timeScale;
@@ -276,15 +310,8 @@
 					protvel = protvelc;
 					friction = 0.075;
 				}
-				if(keys[81] && movePage == '' && pageOn > 0){
-					movePage = 'left';
-					tempPage = pageOn;
-					
-				}
-				if(keys[69] && movePage == '' && pageOn < Math.floor(levelPanels.length/panelPerPage)){
-					movePage = 'right';
-					tempPage = pageOn;
-				}
+				
+				
 				if(movePage == 'right'){
 					if(pageOn < tempPage+1){
 						pageOn+=0.05;
@@ -544,7 +571,7 @@
 				this.y+=this.yvel;
 				this.xvel = 0;
 				this.yvel = 0;
-				console.log(this.reloading+", "+this.reload);
+				
 			}
 			
 			this.hurt = function(){
@@ -1103,7 +1130,9 @@
 				}
 			}
 			if(!levelCompleted && tanks.length == 0){
-				lvlsPassed++;
+				if(lvlsPassed <= lvl){
+					lvlsPassed = lvl+1;
+				}
 				localStorage.setItem("lvlsPassed", lvlsPassed);
 				levelCompleted = true;
 			}
@@ -1116,18 +1145,22 @@
 		
 		var levelFinished = function(number){
 			background2(0, 0, 0, 0.3);
-			cx.fillStyle = 'rgb(0, 130, 255)';
+			cx.fillStyle = themes[currTheme][0];
 			cx.strokeStyle = 'rgb(255, 255, 255)';
 			
 			cx.fillRect(300, 50, 300, 400);
 			cx.strokeRect(300, 50, 300, 400);
 			cx.font = '25px GameFont';
-			cx.fillStyle = "black";
+			if(currTheme <= 3){
+				cx.fillStyle = "black";
+			} else {
+				cx.fillStyle = "white";
+			}
 			cx.textAlign = "center";
 			cx.fillText("Level Passed!", 450, 100);
-			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Menu", 15)).act();
-			(new Button(450, 250, 125, 50, function(){levelCompleted = false; screen = 3;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Level Select", 15)).act();
-			//(new Button(450, 325, 125, 50, function(){levelCompleted = false; levelPanels[lvl].playLevel();}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Replay", 15)).act();
+			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1;}, themes[currTheme][1], themes[currTheme][2], "Menu", 15, 0, "black")).act();
+			(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
+			//(new Button(450, 325, 125, 50, function(){levelCompleted = false; levelPanels[lvl].playLevel(); screen = 2;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Replay", 15)).act();
 			
 			
 			
@@ -1171,7 +1204,7 @@
 			
 		}
 		
-		function Button(x, y, w, h, action, oncolor, offcolor, name, fontSize){
+		function Button(x, y, w, h, action, oncolor, offcolor, name, fontSize, lvlPane, fontColor){
 			this.x = x;
 			this.y = y;
 			this.w = w;
@@ -1179,12 +1212,18 @@
 			this.fontSize = fontSize;
 			this.action = action;
 			this.name = name;
+			this.lvlPane = lvlPane;
+			this.fontColor = fontColor;
 			
 			this.act = function(){
 				if(mouseX > this.x-(this.w/2) && mouseX < this.x+(this.w/2) && mouseY > this.y-(this.h/2) && mouseY < this.y+(this.h/2)){
 					cx.fillStyle = oncolor;
 					if(clicked){
-						this.action();
+						if(this.lvlPane != undefined && this.lvlPane != 0){
+							this.lvlPane.playLevel();		//playLevel();
+						} else {
+							this.action();
+						}
 						
 					}
 				} else {
@@ -1192,18 +1231,19 @@
 				}
 				cx.fillRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
 				cx.font = 'bold '+this.fontSize+'px GameFont';
-				cx.fillStyle = 'rgb(0, 0, 0)';
+				
+				cx.fillStyle = this.fontColor;
 				cx.textAlign = 'center';
 				cx.textBaseline = 'middle';
 				cx.fillText(this.name, x, y);
-				cx.strokeStyle = 'rgb(0, 0, 0)';
+				cx.strokeStyle = this.fontColor;
 				cx.strokeRect(this.x-(this.w/2), this.y-(this.h/2), this.w, this.h);
 			}
 		}
 		
 		function menu(){
 			background(255, 255, 255);
-			playbutton = new Button(450, 100, 150, 50, function(){screen = 3;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 30);
+			playbutton = new Button(450, 100, 150, 50, function(){screen = 3;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 30, 0, 'black');
 			if(screen == 1){
 				playbutton.act();
 			}
@@ -1218,41 +1258,44 @@
 		var panelH = 350;
 		
 		
-		var levelPanels = [];
-		var pos = 0;
-
-		levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 50, 225);
-		pos = 1;
-		levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
-		pos = 2;
-		levelPanels[pos] = new LevelPanel(pos, 8, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
 		
 		
 		
 		function LevelPanel(num, tankNum, ammoNum, tankList, wallList, ammoList, healthList, psx, psy){
 			this.num = num;
+			
 			this.tankNum = tankNum;
+			
+			
 			this.ammoNum = ammoNum;
 			this.tankList = tankList;
+			console.log(typeof(tankList)+", "+typeof(this.tankList));
+			
 			this.wallList = wallList;
 			this.ammoList = ammoList;
 			this.healthList = healthList;
 			this.psx = psx;
 			this.psy = psy;
-			this.panelC = 'rgb(0, 130, 255)';
+			this.themeOn = Math.floor(this.num/lvlPerCampaign);
+			this.panelC = themes[this.themeOn][0];
 			if(this.psx == undefined || this.psy == undefined){
 				this.psx = 200;
 				this.psy = 200;
 			}
-			console.log(this.psx+", "+this.psy);
+			
 			
 			this.x = 0;
 			this.y = 0;
 			this.page = 0;
 			this.b; 
+			
 			this.draw = function(){
-				this.b = new Button(this.x+(-900*pageOn), this.y+200, 75, 25, this.playLevel, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 15)
-				
+				if(this.themeOn <= 3){
+					this.b = new Button(this.x+(-900*pageOn), this.y+200, 75, 25, this.playLevel, themes[this.themeOn][1], themes[this.themeOn][2], "Play", 15, this, 'black');
+				} else {
+					this.b = new Button(this.x+(-900*pageOn), this.y+200, 75, 25, this.playLevel, themes[this.themeOn][1], themes[this.themeOn][2], "Play", 15, this, 'white');
+				}
+				console.log(typeof(this.tankList));
 				this.y = 75;
 				cx.save();
 				cx.translate(-900*pageOn, 0);
@@ -1264,8 +1307,11 @@
 				
 				
 				cx.fillRect(this.x-panelW/2, this.y, panelW, panelH);
-				
-				cx.fillStyle = "black";
+				if(this.themeOn <= 3){
+					cx.fillStyle = "black";
+				} else {
+					cx.fillStyle = "white";
+				}
 				cx.font = '30px GameFont';
 				cx.textAlign = "center";
 				if(num == 0){
@@ -1276,10 +1322,14 @@
 				cx.font = '12px GameFont';
 				cx.fillText("Ammo: "+this.ammoNum, this.x, this.y+150);
 				cx.fillText("Tanks: "+this.tankNum, this.x, this.y+175);
+				
 				cx.restore();
 				if(lvlsPassed >= this.num){
 					this.b.act();
 				} else {
+					cx.save();
+					cx.translate(-900*pageOn, 0);
+					
 					cx.strokeStyle = "black";
 					cx.fillStyle = this.panelC;
 					cx.lineWidth = "4";
@@ -1292,17 +1342,23 @@
 					cx.fillRect(this.x-3, this.y+270, 6, 10);
 					cx.strokeStyle = "rgba(0, 0, 0, 0)";
 					circle(this.x, this.y+268, 5);
+					cx.restore();
 					
 				}
 				
-			}
-			this.playLevel = function(){
 				
-				tanks = levels[num][0];
-				gameObjects = levels[num][1];
-				ammoPacks = levels[num][2];
-				healthPacks = levels[num][3];
-				console.log(this.psx+", "+this.psy);
+			}
+			
+			this.playLevel = function(){
+				console.log(typeof(this));
+				console.log(this);
+				console.log(typeof(this.tankList));
+				tanks = this.tankList;
+				
+				gameObjects = this.wallList;
+				ammoPacks = this.ammoList;
+				healthPacks = this.healthList;
+				
 				px = psx;
 				py = psy;
 				console.log(px+", "+py);
@@ -1310,6 +1366,10 @@
 				ammoc = ammoNum;
 				screen = 2;
 				lvl = num;
+				initLevel();
+				
+				phealth = pmaxhealth;
+				
 				
 			}
 			
@@ -1321,7 +1381,52 @@
 				levelPanels[v].draw();
 				//console.log(levelPanels[v]);
 			}
-			console.log(lvlsPassed);
+			
+			if(mouseX < 325 && mouseX > 300 && mouseY > 450 && mouseY < 475){
+				cx.fillStyle = 'rgb(0, 170, 255)';
+				if(clicked && movePage == '' && pageOn > 0){
+					movePage = 'left';
+					tempPage = pageOn;
+					
+				}
+			} else {
+				cx.fillStyle = 'rgb(0, 130, 255)';
+			}
+			if(!(movePage == '' && pageOn > 0)){
+				cx.fillStyle = 'rgb(190, 190, 210)';
+			}
+			cx.beginPath();	
+			cx.moveTo(300, 462.5);
+			cx.lineTo(325, 450);
+			cx.lineTo(325, 475);
+			cx.lineTo(300, 462.5);
+			
+			
+			cx.fill();
+			cx.closePath();
+			
+			if(mouseX < 600 && mouseX > 575 && mouseY > 450 && mouseY < 475){
+				cx.fillStyle = 'rgb(0, 170, 255)';
+				if(clicked && movePage == '' && pageOn < Math.floor(levelPanels.length/panelPerPage)){
+					movePage = 'right';
+					tempPage = pageOn;
+				}
+			} else {
+				cx.fillStyle = 'rgb(0, 130, 255)';
+			}
+			if(!(movePage == '' && pageOn < Math.floor(levelPanels.length/panelPerPage))){
+				cx.fillStyle = 'rgb(190, 190, 210)';
+			}
+			
+			cx.beginPath();
+			cx.moveTo(600, 462.5);
+			cx.lineTo(575, 450);
+			cx.lineTo(575, 475);
+			cx.lineTo(600, 462.5);
+			
+			cx.fill();
+			cx.closePath();
+			
 			
 		}
 		
@@ -1334,7 +1439,10 @@
 			cx.fillRect(0, 0, 900, 500);
 		}
 		var screenFunction = function(){
-			
+			currTheme = Math.floor(lvl/lvlPerCampaign);
+			if(clickDelay > 0){
+				clickDelay--;
+			}
 			//.log(screen);
 			if(screen == 0){
 				loading();
@@ -1349,7 +1457,8 @@
 				drawGame();
 				cx.fillStyle = 'rgb(0, 0, 0)';
 			cx.fillText(mouseX+", "+mouseY, 50, 460);
-			console.log(tanks[0].t);
+			
+			
 			
 			}
 			if(screen == 3){
@@ -1357,6 +1466,7 @@
 				keyControl();
 				cx.fillStyle = 'rgb(0, 0, 0)';
 			cx.fillText(mouseX+", "+mouseY, 50, 460);
+			
 			
 			}
 		}
