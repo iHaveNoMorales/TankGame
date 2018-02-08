@@ -99,7 +99,7 @@
 		
 		
 		var currTheme = 0;
-		var themes = [['rgb(0, 130, 0)', 'rgb(38, 180, 38)', 'rgb(38, 210, 38)'], ['rgb(194, 178, 128)', 'rgb(219, 203, 153)', 'rgb(234, 218, 168)'],  ['rgb(130, 130, 130)', 'rgb(180, 180, 180)', 'rgb(210, 210, 210)'], ['rgb(101, 67, 33)',  'rgb(120, 88, 39)', 'rgb(139, 93, 46)',]];
+		var themes = [['rgb(0, 130, 0)', 'rgb(0, 156, 0)', 'rgb(0, 181, 0)'], ['rgb(194, 178, 128)', 'rgb(202, 188, 145)', 'rgb(211, 199, 162)'],  ['rgb(130, 130, 130)', 'rgb(143, 143, 143)', 'rgb(156, 156, 156)'], ['rgb(101, 67, 33)',  'rgb(120, 88, 39)', 'rgb(139, 93, 46)',]];
 		var lvlPerCampaign = 1;
 		
 		initLevel();
@@ -281,6 +281,7 @@
 		var protvel = protvelc;
 		
 		var tempPage;
+		var paused = false;
 		function keyControl(){
 			
 			if(phealth>0 && !levelCompleted){ //tank doesn't move after death
@@ -309,6 +310,9 @@
 				} else {
 					protvel = protvelc;
 					friction = 0.075;
+				}
+				if(keys[27] && screen == 2 && !paused){
+					paused = true;
 				}
 				
 				
@@ -737,7 +741,7 @@
 			this.act = function(){
 				
 				this.draw();
-				if(phealth>0 && !levelCompleted){
+				if(phealth>0 && !levelCompleted && !paused){
 					this.think(); //stops enemies from shooting dead player
 				}
 			}
@@ -901,7 +905,7 @@
 			cx.closePath();
 			//cx.fillRect(-25, -25, 50, 50);
 			cx.restore();
-			if(clicked && preload == 0 && ammo > 0 && !levelCompleted){
+			if(clicked && preload == 0 && ammo > 0 && !levelCompleted && !paused){
 				temps = new Shell(px, py, Math.cos(cannonRot)*10, Math.sin(cannonRot)*10, cannonRot, new Point(-200, -200), true);
 				shells.push(temps);
 				preload = preloadc;
@@ -913,7 +917,7 @@
 			targRot = (Math.atan2(mouseY-py, mouseX-px)+Math.PI*2);
 			var canRotSpeed = 0.08;
 			//cannonRot %= (Math.PI*2);
-			if(!levelCompleted){
+			if(!levelCompleted && !paused){
 				if(cannonRot > targRot){
 					if((Math.abs(cannonRot-(Math.PI*3)) + Math.abs(targRot-Math.PI)) < cannonRot-targRot){
 						cannonRot+=canRotSpeed*timeScale;
@@ -1050,7 +1054,18 @@
 		
 		var drawGame = function(){
 			
-			background(255, 255, 255);
+			if(currTheme == 0){
+				background(0, 130, 0);
+			}
+			if(currTheme == 1){
+				background(194, 178, 128);
+			}
+			if(currTheme == 2){
+				background(130, 130, 130);
+			}
+			if(currTheme == 3){
+				background(101, 67, 33);
+			}
 			
 			if(lvl == 0){
 				cx.fillStyle = "black";
@@ -1159,6 +1174,29 @@
 			cx.textAlign = "center";
 			cx.fillText("Level Passed!", 450, 100);
 			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1;}, themes[currTheme][1], themes[currTheme][2], "Menu", 15, 0, "black")).act();
+			(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
+			//(new Button(450, 325, 125, 50, function(){levelCompleted = false; levelPanels[lvl].playLevel(); screen = 2;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Replay", 15)).act();
+			
+			
+			
+		}
+		
+		var pauseScreen = function(){
+			background2(0, 0, 0, 0.3);
+			cx.fillStyle = themes[currTheme][0];
+			cx.strokeStyle = 'rgb(255, 255, 255)';
+			
+			cx.fillRect(300, 50, 300, 400);
+			cx.strokeRect(300, 50, 300, 400);
+			cx.font = '25px GameFont';
+			if(currTheme <= 3){
+				cx.fillStyle = "black";
+			} else {
+				cx.fillStyle = "white";
+			}
+			cx.textAlign = "center";
+			cx.fillText("Paused", 450, 100);
+			(new Button(450, 175, 125, 50, function(){paused = false;}, themes[currTheme][1], themes[currTheme][2], "Resume", 15, 0, "black")).act();
 			(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
 			//(new Button(450, 325, 125, 50, function(){levelCompleted = false; levelPanels[lvl].playLevel(); screen = 2;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Replay", 15)).act();
 			
@@ -1453,10 +1491,13 @@
 				
 			}
 			if(screen == 2){
-			
+				
 				drawGame();
 				cx.fillStyle = 'rgb(0, 0, 0)';
 			cx.fillText(mouseX+", "+mouseY, 50, 460);
+			if(paused){
+					pauseScreen();
+				}
 			
 			
 			
