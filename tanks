@@ -137,6 +137,7 @@
 		var pShot = new Image();
 		var eShot = new Image();
 		var aPack = new Image();
+		var hPack = new Image();
 		var numTanks = 14; 
 		
 		var screen = 1;
@@ -152,6 +153,8 @@
 		pShot.src = 'BlueShot.png';
 		eShot.src = 'RedShot.png';
 		aPack.src = 'AmmoPack.png';
+		hPack.src = 'HealthPack.png';
+		
 		var tanks = [new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)];
 		//tanks.push(new Tank(500, 300));
 		//tanks.push(new Tank(00, 300));
@@ -439,7 +442,7 @@
 				
 				cx.restore();
 				cx.fillStyle = "black";
-				cx.fillText(this.p, this.x, this.y-20);
+				//cx.fillText(this.p, this.x, this.y-20);
 				cx.beginPath();
 				cx.moveTo(this.x, this.y);
 				//cx.strokeStyle = 'red';
@@ -999,9 +1002,7 @@
 			this.w = 30;
 			this.h = 30;
 			this.draw = function(){
-				cx.fillStyle = 'rgb(255, 0, 0)';
-				cx.fillRect(this.x, this.y, this.w, this.h);
-				//cx.drawImage(hPack, this.x, this.y, this.w, this.h);
+				cx.drawImage(hPack, this.x, this.y, this.w, this.h);
 			}
 			
 			this.pickedUp = function(){
@@ -1057,6 +1058,7 @@
 				cx.font = '20px GameFont';
 				cx.textAlign = 'center';
 				cx.fillText("Move with WASD", 450, 150);
+				cx.fillText("Use your cursor to aim", 450, 200);
 			}
 			
 			for(t = 0; t < ammoPacks.length; t++){
