@@ -102,7 +102,7 @@
 		
 		
 
-
+		
 		var tutorial;
 		var levelOne;
 		var levelTwo;
@@ -128,6 +128,10 @@
 			levelSeven = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 			
 			levels = [tutorial, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven]; //tank wall ammo health
+<<<<<<< HEAD
+=======
+			
+>>>>>>> b3061f968cba829f513e6034a782109d2b16be2e
 			pos = 0;
 			levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 50, 225);
 			pos = 1;
@@ -195,9 +199,10 @@
 		
 		
 		var clicked = false;
+		var mouseup = false;
 		canvas.addEventListener("mousemove", getMouseCoords, false);
 		canvas.addEventListener("mousedown", function(event){if(clickDelay == 0){clicked = true; clickDelay = clickDelayc;}}, false);
-		canvas.addEventListener("mouseup", function(event){clicked = false;}, false);
+		canvas.addEventListener("mouseup", function(event){clicked = false; mouseup = true;}, false);
 		
 		
 		
@@ -1271,7 +1276,7 @@
 			this.act = function(){
 				if(mouseX > this.x-(this.w/2) && mouseX < this.x+(this.w/2) && mouseY > this.y-(this.h/2) && mouseY < this.y+(this.h/2)){
 					cx.fillStyle = oncolor;
-					if(clicked){
+					if(mouseup){
 						if(this.lvlPane != undefined && this.lvlPane != 0){
 							this.lvlPane.playLevel();
 						} else {
@@ -1645,6 +1650,7 @@
 			cx.font = '13px GameFont';
 			cx.fillText(mouseX+", "+mouseY, 50, 400);
 			cx.fillText(fKey, 50, 420);
+			mouseup = false;
 		}
 		setInterval(screenFunction, 20);
 		
