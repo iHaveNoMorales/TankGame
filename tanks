@@ -50,7 +50,7 @@
 		var xveltarg = 0;
 		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 1000;
+		var pmaxhealth = 100;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
@@ -131,7 +131,7 @@
 			levelSeven = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 			
 			levels = [tutorial, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven]; //tank wall ammo health
-			
+
 			pos = 0;
 			levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 50, 225);
 			pos = 1;
@@ -172,6 +172,7 @@
 		var sand = new Image();
 		var rocky = new Image();
 		var forest = new Image();
+		var youDied = new Image();
 
 		var numTanks = 14; 
 		
@@ -193,7 +194,7 @@
 		sand.src = 'sand.png';
 		rocky.src = 'rocky.png';
 		forest.src = 'forest.png';
-
+		youDied.src = 'youDied.png';
 		
 		var tanks = [new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)];
 		
@@ -1021,6 +1022,8 @@
 			cx.textAlign = "left";
 			
 			cx.fillText("Ammo: "+ammo, 5, 50);
+			
+			
 		}
 		function AmmoPack(x, y){
 			this.x = x;
@@ -1180,6 +1183,11 @@
 			if(phealth > 0){
 				player();
 			}
+			if(phealth<=0){
+				if(screen == 2){
+					deathScreen();
+				}
+			}
 			keyControl();
 			if(enemyForm){
 				if(form == 'circle'){
@@ -1235,6 +1243,12 @@
 			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1; onSettings = false;}, themes[currTheme][1], themes[currTheme][2], "Menu", 15, 0, "black")).act();
 			(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
 		}
+		
+		var deathScreen = function(){
+			cx.drawImage(youDied, 0, 0, 900, 500);
+			(new Button(450, 275, 125, 50, function(){levelCompleted = false; screen = 1; clickDelay = 25; paused = false;}, 'rgb( 77, 77, 77)', 'rgb( 90, 90, 90)', "Menu", 15, 0, "black")).act();
+			(new Button(450, 375, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25; paused = false;}, 'rgb( 77, 77, 77)', 'rgb( 90, 90, 90)', "Level Select", 15, 0, "black")).act();
+		} 
 		
 		var pauseScreen = function(){
 			background2(0, 0, 0, 0.3);
