@@ -50,7 +50,7 @@
 		var xveltarg = 0;
 		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 1000;
+		var pmaxhealth = 100;
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
@@ -128,7 +128,7 @@
 			levelSeven = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 			
 			levels = [tutorial, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven]; //tank wall ammo health
-			
+			pos = 0;
 			levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 50, 225);
 			pos = 1;
 			levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], 200, 200);
@@ -757,14 +757,6 @@
 			}
 			
 			this.act = function(){
-				if(lvl == 0){
-					if(this.p == 1 && this.t == true){
-						if(tanks[0].health <= 0){
-							this.t = false;
-							this.health = 10;
-						}
-					}
-				}
 				this.draw();
 				if(phealth>0 && !levelCompleted && !paused){
 					this.think(); //stops enemies from shooting dead player
@@ -983,6 +975,10 @@
 			cx.textAlign = "left";
 			
 			cx.fillText("Ammo: "+ammo, 5, 50);
+			if(phealth<=0){
+				screen = 1;
+			}
+			
 		}
 		function AmmoPack(x, y){
 			this.x = x;
