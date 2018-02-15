@@ -103,11 +103,9 @@
 		var lKey = Number(localStorage.getItem("lKey")); //left turn key
 		var rKey = Number(localStorage.getItem("rKey")); //right turn key
 		
-		var m = new Mine(300, 300);
-		
 		
 		var shells = [];
-		var mines = [m];
+		var mines = [];
 		
 
 		var night = true;
