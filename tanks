@@ -102,9 +102,9 @@
 		var rKey = Number(localStorage.getItem("rKey")); //right turn key
 		
 		var shells = [];
+		var mines = [];
 		
 		
-
 		
 		var tutorial;
 		var levelOne;
@@ -122,7 +122,7 @@
 		initLevel();
 		function initLevel() {
 			tutorial = [[new Tank(800, 225, 0, true), new Tank(850, 350, 1, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], []]; 
-			levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400)], [new HealthPack(450, 450)]];
+			levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400), new AmmoPack(750, 200), new AmmoPack(50, 50)], [new HealthPack(450, 450)]];
 			levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 		    levelThree = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
 			levelFour = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], []]
@@ -447,11 +447,6 @@
 			
 		}
 		
-		
-		
-		function Attribute(s, a){
-		
-		}
 		
 		function Tank(x, y, p, t, i){
 
@@ -815,7 +810,51 @@
 		};
 
 
-
+		function Mine(x, y){
+			this.x = x;
+			this.y = y;
+			this.w = 30;
+			this.h = 30;
+			this.rad = 0;
+			this.exploding = 0;
+			
+			this.draw = function(){
+				cx.fillStyle = 'red';
+				cx.fillRect(this.x, this.y, this.w, this.h);
+			}
+			
+			this.explode = function(){
+				this.rad+=15*timeScale;
+				cx.save();
+				cx.translate(this.x, this.y);
+				
+				cx.drawImage(explosion, -0.5*this.rad, -0.5*((6/5)*this.rad), this.rad, (6/5)*this.rad);
+				
+				cx.restore();
+				if(this.rad > 90){
+					this.exploding = -1;
+				}
+			}
+			
+			this.hit = function(){
+				if (px - 25 < this.x + this.w &&
+				px + 25 > this.x &&
+				py - 25 < this.y + this.h &&
+				py + 25 > this.y ){
+					return true;
+				}
+			}
+			
+			
+			this.act = function(){
+				if(this.exploding == 0){
+					this.draw();
+				}
+				if(this.hit()){
+					this.explode();
+				}
+			}
+		}
 		
 		function Shell(x, y, vx, vy, rota, target, play){
 			this.vx = vx;
@@ -1012,6 +1051,16 @@
 				}
 			}
 			
+			for(q = 0; q < mines.length; q++){
+				if(mines[q].exploding == 1){
+					if(dist(mines[q].x, mines[q].y, px, py) <= mines[q].rad*0.5 && precover == 0){
+
+						phealth -= 10;
+						precover = precoverc;
+					}
+				}
+			}
+			
 			if(precover > 0){
 				precover-=timeScale;
 			}
@@ -1172,6 +1221,18 @@
 					shells.splice(k, 1);
 					k--;
 					if(shells.length == 0){
+						break;
+					}
+					
+				}
+			}
+			
+			for(k = 0; k < mines.length; k++){
+				mines[k].act();
+				if(mines[k].exploding == -1){
+					mines.splice(k, 1);
+					k--;
+					if(mines.length == 0){
 						break;
 					}
 					
