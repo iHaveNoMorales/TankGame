@@ -98,10 +98,12 @@
 		localStorage.setItem("bKey", 18);
 		localStorage.setItem("lKey", 0);
 		localStorage.setItem("rKey", 3);*/
+		
 		var fKey = Number(localStorage.getItem("fKey")); //forward key
 		var bKey = Number(localStorage.getItem("bKey")); //backward key
 		var lKey = Number(localStorage.getItem("lKey")); //left turn key
 		var rKey = Number(localStorage.getItem("rKey")); //right turn key
+		var volume = localStorage.getItem("volume");
 		
 		var shells = [];
 		
@@ -208,6 +210,31 @@
 		var expAudio = [exp1, exp2, exp3, exp4, exp5];
 		var expAudioOn = 0;
 		
+		for(var aud in expAudio){
+			expAudio[aud].volume = 0.1;
+		}
+		
+		
+		var song1 = new Audio('1.mp3');
+		var song2 = new Audio('2.mp3');
+		var song3 = new Audio('3.mp3');
+		var song4 = new Audio('4.mp3');
+		var song5 = new Audio('5.mp3');
+		var song6 = new Audio('6.mp3');
+		var songs = [song1, song2, song3, song4, song5, song6];
+		for(var audio in songs){
+			songs[audio].volume = volume;
+			console.log(songs[audio].src);
+		}
+		songs = shuffle(songs);
+		
+		for(var audio in songs){
+			
+			console.log(songs[audio].src);
+		}
+		
+		var songon = 0;
+		
 		var tankNoise = new Audio('tankmove.mp3');
 		
 		
@@ -238,6 +265,25 @@
 			
 			
 			
+		}
+		
+		function shuffle(array) {
+		  var currentIndex = array.length, temporaryValue, randomIndex;
+
+		  // While there remain elements to shuffle...
+		  while (0 !== currentIndex) {
+
+			// Pick a remaining element...
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
+
+			// And swap it with the current element.
+			temporaryValue = array[currentIndex];
+			array[currentIndex] = array[randomIndex];
+			array[randomIndex] = temporaryValue;
+		  }
+
+		  return array;
 		}
 		var cannonRot = 0;
 
@@ -351,7 +397,7 @@
 					moving = true;
 					
 				}
-				console.log(bKey+37);
+				//console.log(bKey+37);
 				if(keys[bKey+37]){
 					pyvel = Math.cos(prot)*pspeed*timeScale;
 					pxvel = -1*Math.sin(prot)*pspeed*timeScale;
@@ -360,6 +406,7 @@
 				}
 				if(moving){
 					tankNoise.play();
+					tankNoise.loop = true;
 				} else {
 					tankNoise.pause();
 				}
@@ -390,6 +437,7 @@
 				if(escDelay > 0){
 					escDelay--;
 				}
+				
 				
 				
 				if(movePage == 'right'){
@@ -1240,7 +1288,7 @@
 				if(!play){
 					if((dist(this.x, this.y, this.target.x, this.target.y) < 35 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
 						this.exploding = 1;
-						//expAudio[expAudioOn].play();
+						expAudio[expAudioOn].play();
 						expAudioOn++;
 						if(expAudioOn == expAudio.length){
 							expAudioOn = 0;
@@ -1249,7 +1297,7 @@
 				} else {
 					if(tanks.length == 0 && (this.distance > 250 && this.exploding == 0)){
 						this.exploding = 1;
-						//expAudio[expAudioOn].play();
+						expAudio[expAudioOn].play();
 						expAudioOn++;
 						if(expAudioOn == expAudio.length){
 							expAudioOn = 0;
@@ -1258,7 +1306,7 @@
 					for(o = 0; o < tanks.length; o++){
 						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 35 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
 							this.exploding = 1;
-							//expAudio[expAudioOn].play();
+							expAudio[expAudioOn].play();
 						expAudioOn++;
 						if(expAudioOn == expAudio.length){
 							expAudioOn = 0;
@@ -1682,7 +1730,7 @@
 		var loadAni = 500;
 		function loading(){
 			background(255, 255, 255);
-			console.log(loadAni);
+			//console.log(loadAni);
 			loadAni--;
 			if(loadAni == 0){
 				screen = 1;
@@ -1794,7 +1842,7 @@
 				playbutton.act();
 				settingsB.act();
 			}
-			console.log(screen);
+			//console.log(screen);
 			
 			
 		}
@@ -1816,7 +1864,7 @@
 			
 			this.ammoNum = ammoNum;
 			this.tankList = tankList;
-			console.log(typeof(tankList)+", "+typeof(this.tankList));
+			//console.log(typeof(tankList)+", "+typeof(this.tankList));
 			
 			this.wallList = wallList;
 			this.ammoList = ammoList;
@@ -1842,7 +1890,7 @@
 				} else {
 					this.b = new Button(this.x+(-900*pageOn), this.y+200, 75, 25, this.playLevel, themes[this.themeOn][1], themes[this.themeOn][2], "Play", 15, this, 'white');
 				}
-				console.log(typeof(this.tankList));
+				//console.log(typeof(this.tankList));
 				this.y = 75;
 				cx.save();
 				cx.translate(-900*pageOn, 0);
@@ -1896,9 +1944,9 @@
 			}
 			
 			this.playLevel = function(){
-				console.log(typeof(this));
-				console.log(this);
-				console.log(typeof(this.tankList));
+				//console.log(typeof(this));
+				//console.log(this);
+				//console.log(typeof(this.tankList));
 				tanks = this.tankList;
 				
 				gameObjects = this.wallList;
@@ -1907,7 +1955,7 @@
 				
 				px = psx;
 				py = psy;
-				console.log(px+", "+py);
+				//console.log(px+", "+py);
 				ammo = ammoNum;
 				ammoc = ammoNum;
 				screen = 2;
@@ -1988,12 +2036,14 @@
 		}
 		var onSettings = false;
 		var settingsSliderX = 315+((difficulty-1)*125);
+		var setVolSliderX = 315+(songs[0].volume*250);
 		var mindiff, mindist;
 		var settings = function(){
 			backB = new Button(75, 450, 100, 50, function(){onSettings = false;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Back", 30, 0, 'black');
 			background(255, 255, 255);
 			cx.font = '40px GameFont';
 			settingsSliderX = 315+((difficulty-1)*125);
+			setVolSliderX = 315+(songs[0].volume*250);
 			cx.fillStyle = "black";
 			cx.textBaseline = "middle";
 			cx.textAlign = "center";
@@ -2005,19 +2055,23 @@
 			cx.fillText("Left: ", 150, 280);
 			cx.fillText("Right: ", 150, 320);
 			cx.fillText("Difficulty: ", 150, 360);
+			cx.fillText("Volume: ", 150, 400);
 			cx.textAlign = "center";
 			cx.font = '13px GameFont';
 			cx.fillText("Easy", 315, 380);
 			cx.fillText("Medium", 440, 380);
 			cx.fillText("Hard", 565, 380);
-			
+			cx.font = '20px GameFont';
 			if(mouseX > 305 && mouseX < 315+cx.measureText(String(keyCodes[fKey])).width && mouseY > 190 && mouseY < 210){
 				cx.fillStyle = "#555";
 				cx.fillText(keyCodes[fKey], 310, 200);
 				if(keydown){
 					for(var key in keys){
 						if(keys[key]){
-							fKey = key-37;
+							if(key-37 != bKey && key-37 != lKey && key-37 != rKey){
+								fKey = key-37;
+							}
+							
 							localStorage.setItem("fKey", fKey);
 							break;
 						}
@@ -2053,7 +2107,9 @@
 				if(keydown){
 					for(var key in keys){
 						if(keys[key]){
-							lKey = key-37;
+							if(key-37 != fKey && key-37 != bKey && key-37 != rKey){
+								lKey = key-37;
+							}
 							localStorage.setItem("lKey", lKey);
 							break;
 						}
@@ -2070,7 +2126,9 @@
 				if(keydown){
 					for(var key in keys){
 						if(keys[key]){
-							rKey = key-37;
+							if(key-37 != fKey && key-37 != lKey && key-37 != bKey){
+								rKey = key-37;
+							}
 							localStorage.setItem("rKey", rKey);
 							break;
 						}
@@ -2127,7 +2185,48 @@
 			cx.stroke();
 			cx.fill();
 			
-
+			if(mouseX > 315 && mouseX < 565 && mouseY < 408 && mouseY > 392){
+				if(clicked){
+					setVolSliderX = mouseX;
+					cx.fillStyle = "#e6e6e6";
+					
+					for(var son in songs){
+						songs[son].volume = (mouseX-315)/250;
+					}
+					localStorage.setItem("volume", ((mouseX-315)/250)-0.3);
+				} else {
+					cx.fillStyle = "#fff";
+				}
+			} else {
+				cx.fillStyle = "#fff";
+			}
+			
+			
+			cx.lineJoin = "round";
+			cx.strokeStyle = "black";
+			cx.lineWidth = 9;
+			cx.beginPath();
+			cx.moveTo(315, 400);
+			cx.lineTo(565, 400);
+			cx.closePath();
+			cx.stroke();
+			cx.strokeStyle = "#555";
+			cx.lineWidth = 6;
+			cx.beginPath();
+			cx.moveTo(315, 400);
+			cx.lineTo(565, 400);
+			cx.closePath();
+			cx.stroke();
+			
+			cx.strokeStyle = "#000";
+			cx.lineWidth = 3;
+			cx.beginPath();
+			cx.arc(setVolSliderX, 400, 10, 0, 2*Math.PI);
+			cx.closePath();
+			cx.stroke();
+			cx.fill();
+			
+			
 			
 			
 			cx.lineWidth = 1;
@@ -2171,9 +2270,24 @@
 			if(onSettings == true){
 				settings();
 			}
+			if(keys[78] && Math.floor(songs[songon].currentTime) > 0){
+				songs[songon].currentTime = songs[songon].duration;
+				
+				
+			}
+			if(songs[songon].ended){
+				songon++;
+			}
+			
+			songs[songon].play();
+			
+			if(songon == songs.length){
+				songon = 0;
+			}
 			cx.font = '13px GameFont';
 			cx.fillText(mouseX+", "+mouseY, 50, 400);
-			cx.fillText(fKey, 50, 420);
+			cx.fillText(Math.round(songs[songon].currentTime)+"/"+Math.round(songs[songon].duration), 50, 420);
+			console.log(songs[songon].volume);
 			mouseup = false;
 		}
 		setInterval(screenFunction, 20);
