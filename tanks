@@ -218,7 +218,8 @@
 		for(var aud in expAudio){
 			expAudio[aud].volume = 0.1;
 		}
-		
+		var uDied = new Audio('youDied.mp3');
+		var dsplayed = false;
 		
 		var song1 = new Audio('1.mp3');
 		var song2 = new Audio('2.mp3');
@@ -577,7 +578,18 @@
 			}
 			this.draw = function(){
 				cx.fillStyle = "black";
-				
+				if(this.x<=-15){ //boundaries
+					this.x=-15;
+				}
+				else if(this.x>=915){
+					this.x=915;
+				}
+				if(this.y<=-15){
+					this.y=-15;
+				}
+				else if(this.y>=515){
+					this.y=515;
+				}
 				cx.save();
 				cx.translate(this.x, this.y);
 				if(!this.t){
@@ -1457,6 +1469,18 @@
 		
 		var player = function(){
 			cx.fillStyle = "black";
+			if(px<=-15){  //boundaries
+					px=-15;
+				}
+				else if(px>=915){
+					px=915;
+				}
+				if(py<=-15){
+					py=-15;
+				}
+				else if(py>=515){
+					py=515;
+				}
 			cx.save();
 			cx.translate(px, py);
 			
@@ -1781,9 +1805,13 @@
 		}
 		
 		var deathScreen = function(){
+			if(dsplayed==false){
+				uDied.play();
+				dsplayed = true;
+			}
 			cx.drawImage(youDied, 0, 0, 900, 500);
-			(new Button(450, 275, 125, 50, function(){levelCompleted = false; screen = 1; clickDelay = 25; paused = false;}, 'rgb( 77, 77, 77)', 'rgb( 90, 90, 90)', "Menu", 15, 0, "black")).act();
-			(new Button(450, 375, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25; paused = false;}, 'rgb( 77, 77, 77)', 'rgb( 90, 90, 90)', "Level Select", 15, 0, "black")).act();
+			(new Button(450, 275, 125, 50, function(){levelCompleted = false; screen = 1; clickDelay = 25; paused = false; dsplayed = false;}, 'rgb( 77, 77, 77)', 'rgb( 90, 90, 90)', "Menu", 15, 0, "black")).act();
+			(new Button(450, 375, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25; paused = false; dsplayed = false;}, 'rgb( 77, 77, 77)', 'rgb( 90, 90, 90)', "Level Select", 15, 0, "black")).act();
 		} 
 		
 		var pauseScreen = function(){
@@ -2279,7 +2307,7 @@
 					for(var son in songs){
 						songs[son].volume = (mouseX-315)/250;
 					}
-					localStorage.setItem("volume", ((mouseX-315)/250)-0.3);
+					localStorage.setItem("volume", ((mouseX-315)/250));
 				} else {
 					cx.fillStyle = "#fff";
 				}
