@@ -1759,8 +1759,10 @@
 				cx.fillStyle = "black";
 				cx.font = '20px GameFont';
 				cx.textAlign = 'center';
-				cx.fillText("Move with WASD", 450, 150);
-				cx.fillText("Use your cursor to aim", 450, 200);
+				cx.fillText("Move with " + keyCodes[fKey] + " and " + keyCodes[bKey], 450, canvas.height/2-70);
+				cx.fillText("Rotate with " + keyCodes[lKey] + " and " + keyCodes[rKey], 450, canvas.height/2-40);
+				cx.fillText("Use your cursor to aim", 450, canvas.height/2+40);
+				cx.fillText("Click to shoot", 450, canvas.height/2+70);
 			}
 			
 			for(t = 0; t < ammoPacks.length; t++){
