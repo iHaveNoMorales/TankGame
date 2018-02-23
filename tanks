@@ -42,8 +42,8 @@
 		var cx = canvas.getContext("2d");
 		var prot = 0;
 		
-		var menuPx = 375;
-		var menuPy = 300;
+		var menuPx = 300;
+		var menuPy = 250;
 		var cons = [5, 10, 65, 100, 5];
 		
 		localStorage.setItem("money", 10000);
@@ -63,26 +63,31 @@
 		var pspeed = localStorage.getItem("pspeed"); 
 		if(pspeed == undefined){
 			pspeed = cons[0];
+			localStorage.setItem("pspeed", pspeed);
 		}
 	//	localStorage.setItem("pshotspeed", cons[1]);
 		var pshotspeed = localStorage.getItem("pshotspeed");
 		if(pshotspeed == undefined){
 			pshotspeed = cons[1];
+			localStorage.setItem("pshotspeed", pshotspeed);
 		}
 	//	localStorage.setItem("preloadc", cons[2]);
 		var preloadc = localStorage.getItem("preloadc");
 		if(preloadc == undefined){
 			preloadc = cons[2];
+			localStorage.setItem("preloadc", preloadc);
 		}
-		localStorage.setItem("pmaxhealth", cons[3]);
+		//localStorage.setItem("pmaxhealth", cons[3]);
 		var pmaxhealth = localStorage.getItem("pmaxhealth");
 		if(pmaxhealth == undefined){
 			pmaxhealth = cons[3];
+			localStorage.setItem("pmaxhealth", pmaxhealth);
 		}
 	//	localStorage.setItem("pdamage", cons[4]);
 		var pdamage = localStorage.getItem("pdamage");
 		if(pdamage == undefined){
 			pdamage = cons[4];
+			localStorage.setItem("pdamage", pdamage);
 		}
 		var preload = preloadc;
 		
@@ -111,7 +116,7 @@
 		
 		//localStorage.setItem("lvlsPassed", 0);
 		var lvlsPassed = localStorage.getItem('lvlsPassed');
-		lvlsPassed = 0;
+		//lvlsPassed = 0;
 		
 		//var lvlsPassed = 0;
 		if(lvlsPassed == undefined){
@@ -1186,7 +1191,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad*0.5 && this.recover == 0){
-							this.health -= damage;
+							this.health -= pdamage;
 							this.recover = this.recoverc;
 							cx.fillStyle = "black";
 							
@@ -2052,11 +2057,12 @@
 				playbutton.act();
 				settingsB.act();
 				storeB.act();
+
 			}
-			////console.log(screen);
-			
-			
+
 		}
+			
+		
 		
 		function store(){
 			if(screen != 2){
@@ -2688,11 +2694,11 @@
 					moneyChanges.splice(mc, 1);
 				}
 			}
-			pspeed = localStorage.getItem("pspeed");
+			/*pspeed = localStorage.getItem("pspeed");
 			preloadc = localStorage.getItem("preloadc");
 			pmaxhealth = localStorage.getItem("pmaxhealth");
 			pshotspeed = localStorage.getItem("pshotspeed");
-			pdamage = localStorage.getItem("pdamage");
+			pdamage = localStorage.getItem("pdamage");*/ //upgrades set undefined by this
 			
 			cx.font = '13px GameFont';
 			cx.fillText(mouseX+", "+mouseY, 50, 400);
