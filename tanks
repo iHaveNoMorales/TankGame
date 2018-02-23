@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+	<link rel="shortcut icon" type="image/png" href="favicon.png"/>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Tanks</title>
 	<style>
 		canvas {
 			border:1px solid black;
@@ -29,6 +30,8 @@
   </head>
   <body>
   <span style="font-family: 'GameFont', cursive;"></span>
+  
+  <!--<link rel="shortcut icon" type="image/png" href="http://eg.com/favicon.png"/>-->
 	<canvas width="900" height="500" id="can"></canvas>
 	<input type="text" id="input">
 	
@@ -41,17 +44,55 @@
 		
 		var menuPx = 375;
 		var menuPy = 300;
+		var cons = [5, 10, 65, 100, 5];
 		
-		var preloadc = 65;
+		localStorage.setItem("money", 10000);
+		var money = localStorage.getItem("money");
+		console.log(typeof(money));
+		money = Number(money);
+		if(money == undefined){
+			money = 0;
+		}
+		var moneyChanges = [];
+		var instore = false;
+		var moneyPerLevel = 200;
+		var moneyPerRepeat = 10;
+		
+		
+	//	localStorage.setItem("pspeed", 5);
+		var pspeed = localStorage.getItem("pspeed"); 
+		if(pspeed == undefined){
+			pspeed = cons[0];
+		}
+	//	localStorage.setItem("pshotspeed", cons[1]);
+		var pshotspeed = localStorage.getItem("pshotspeed");
+		if(pshotspeed == undefined){
+			pshotspeed = cons[1];
+		}
+	//	localStorage.setItem("preloadc", cons[2]);
+		var preloadc = localStorage.getItem("preloadc");
+		if(preloadc == undefined){
+			preloadc = cons[2];
+		}
+		localStorage.setItem("pmaxhealth", cons[3]);
+		var pmaxhealth = localStorage.getItem("pmaxhealth");
+		if(pmaxhealth == undefined){
+			pmaxhealth = cons[3];
+		}
+	//	localStorage.setItem("pdamage", cons[4]);
+		var pdamage = localStorage.getItem("pdamage");
+		if(pdamage == undefined){
+			pdamage = cons[4];
+		}
 		var preload = preloadc;
-		var pspeed = 5;
+		
 		var pyvel = 0;
 		var pxvel = 0;
 		var yveltarg = 0;
 		var xveltarg = 0;
 		var pacc = 0.15;
 		var textVal = document.getElementById("input").value;
-		var pmaxhealth = 100;
+		
 		var phealth = pmaxhealth;
 		var precoverc = 50;
 		var precover = 0;
@@ -70,6 +111,7 @@
 		
 		//localStorage.setItem("lvlsPassed", 0);
 		var lvlsPassed = localStorage.getItem('lvlsPassed');
+		lvlsPassed = 0;
 		
 		//var lvlsPassed = 0;
 		if(lvlsPassed == undefined){
@@ -136,8 +178,8 @@
 			levelFour = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 			levelFive = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 			levelSix = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
-			levelSeven = [[new Boss(800, 100)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], [], []];
-			
+			levelSeven = [[new Boss(800, 100)], [], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], [], []];
+			//new Wall(150,150, 25, 200)
 			levels = [tutorial, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven]; //tank wall ammo health
 
 			pos = 0;
@@ -233,13 +275,13 @@
 		var songs = [song1, song2, song3, song4, song5, song6, song7, song8];
 		for(var audio in songs){
 			songs[audio].volume = volume;
-			console.log(songs[audio].src);
+			//console.log(songs[audio].src);
 		}
 		songs = shuffle(songs);
 		
 		for(var audio in songs){
 			
-			console.log(songs[audio].src);
+			//console.log(songs[audio].src);
 		}
 		
 		var songon = 0;
@@ -406,7 +448,7 @@
 					moving = true;
 					
 				}
-				//console.log(bKey+37);
+				////console.log(bKey+37);
 				if(keys[bKey+37]){
 					pyvel = Math.cos(prot)*pspeed*timeScale;
 					pxvel = -1*Math.sin(prot)*pspeed*timeScale;
@@ -754,7 +796,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad*0.5 && this.recover == 0){
-							this.health -=5;
+							this.health -= pdamage;
 							this.recover = this.recoverc;
 							cx.fillStyle = "black";
 							
@@ -909,7 +951,7 @@
 			this.y = y;
 			this.rot = 0;
 			this.blocked = false;
-			this.speed = 2*((difficulty/2));
+			this.speed = 5*((difficulty/2));
 			this.targ = new Point(50, 250);
 			this.tempPath = false;
 			this.pathTimer = 0;
@@ -981,6 +1023,9 @@
 				cx.moveTo(this.x, this.y);
 				cx.stroke();
 				cx.closePath();
+				cx.fillStyle = "#000";
+				circle(this.targ.x, this.targ.y, 10);
+				//console.log(this.tr+", "+this.newtarg);
 			}
 			
 			this.shoot = function(rota){
@@ -1003,10 +1048,23 @@
 			this.AI = function(){
 				
 				this.formation = true;
+				
 				if(dist(this.x, this.y, this.targ.x, this.targ.y) <= 6 && !this.newtarg){
 					this.newtarg = true;
-					this.tr = Math.floor(Math.random()*3);
-					if(this.tr%2 == 0){
+					//this.targ = new Point(this.x+(80*Math.cos((tr*Math.PI)/180)), this.y+(80*Math.sin((tr*Math.PI)/180)));
+					if(!pointInWall(this.targ)){
+						
+						this.targ = new Point(px+(180*Math.cos((this.tr*Math.PI)/180)), py+(180*Math.sin((this.tr*Math.PI)/180)));
+					} else {
+						this.tr+=5;
+						this.targ = new Point(px+(180*Math.cos((this.tr*Math.PI)/180)), py+(180*Math.sin((this.tr*Math.PI)/180)));
+					}
+					this.tr+=5;
+					if(this.tr >= 360){
+						this.tr = 0;
+					}
+					/*this.tr = Math.floor(Math.random()*3);
+					/*if(this.tr%2 == 0){
 						if(this.x+70 < 875 && this.y+70 < 475){ 
 							this.targ = new Point(this.targ.x+70, this.targ.y+70);
 						} else if(this.x+70 < 875){
@@ -1027,7 +1085,7 @@
 						} else {
 							this.newtarg = false;
 						}
-					}
+					}*/
 				}
 				if(dist(this.x, this.y, this.targ.x, this.targ.y) > 6 && this.newtarg){
 					this.newtarg = false;
@@ -1090,14 +1148,29 @@
 						}
 					}
 				
+				console.log(this.rot);
+				if(this.srot > this.rot){
+					if((Math.abs(this.srot-(Math.PI*2)) + Math.abs(this.rot)) < this.srot-this.rot){
+						this.srot+=this.turnVel*timeScale;
+					} else {
+						this.srot -= this.turnVel*timeScale;
+					}
+				} else if (this.srot < this.rot){
+					if((Math.abs(this.rot - (Math.PI*2)) + Math.abs(this.srot)) < this.rot - this.srot){
+						this.srot-=this.turnVel*timeScale;
+					} else {
+						this.srot += this.turnVel*timeScale;
+					}
+				}
 				
-				if(this.rot > this.srot){
-					this.srot+=this.turnVel*timeScale;
+				if(this.srot > Math.PI*2){
+					this.srot %= (Math.PI*2);
 				}
-				if(this.rot < this.srot){
-					this.srot-=this.turnVel*timeScale;
+				if(this.srot < 0){
+					this.srot += (Math.PI*2);
 				}
-				if(Math.abs(this.rot-this.srot) < this.turnVel*timeScale){
+				
+				if(Math.abs(this.srot-this.rot) < this.turnVel*timeScale){
 					this.srot = this.rot;
 				}
 				
@@ -1113,7 +1186,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad*0.5 && this.recover == 0){
-							this.health -=5;
+							this.health -= damage;
 							this.recover = this.recoverc;
 							cx.fillStyle = "black";
 							
@@ -1258,6 +1331,12 @@
 			
 		};
 
+		function pointInWall(point){
+			for(var w in gameObjects){
+				wall = gameObjects[w];
+				return (point.x > wall.x && point.x < wall.x+wall.h && point.y > wall.y && point.y < wall.y+wall.h);
+			}
+		}
 
 		function Mine(x, y){
 			this.x = x;
@@ -1293,7 +1372,7 @@
 				}
 				for(o = 0; o < tanks.length; o++){
 					if(tanks[o].x - 25 < this.x + this.w && tanks[o].x + 25 > this.x && tanks[o].y - 25 < this.y + this.h && tanks[o].y + 25 > this.y){
-						console.log("boom");
+						//console.log("boom");
 						if(tanks[o].recover == 0){
 							tanks[o].health -= 5;
 							tanks[o].recover += tanks[o].recoverc;
@@ -1498,7 +1577,7 @@
 			cx.strokeStyle = "black";
 			cx.restore();
 			if(clicked && preload == 0 && ammo > 0 && !levelCompleted && !paused){
-				temps = new Shell(px, py, Math.cos(cannonRot)*10, Math.sin(cannonRot)*10, cannonRot, new Point(-200, -200), true);
+				temps = new Shell(px, py, Math.cos(cannonRot)*pshotspeed, Math.sin(cannonRot)*pshotspeed, cannonRot, new Point(-200, -200), true);
 				shells.push(temps);
 				preload = preloadc;
 				ammo-=timeScale;
@@ -1774,7 +1853,15 @@
 			if(!levelCompleted && tanks.length == 0){
 				if(lvlsPassed <= lvl){
 					lvlsPassed = lvl+1;
+					money += moneyPerLevel;
+					moneyChanges.push(new moneyChange(moneyPerLevel, false));
+				} else {
+					money += moneyPerRepeat;
+					moneyChanges.push(new moneyChange(moneyPerRepeat, false));
 				}
+				localStorage.setItem("money", money);
+				console.log(localStorage.getItem("money"));
+				
 				localStorage.setItem("lvlsPassed", lvlsPassed);
 				levelCompleted = true;
 			}
@@ -1845,7 +1932,7 @@
 		var loadAni = 500;
 		function loading(){
 			background(255, 255, 255);
-			//console.log(loadAni);
+			////console.log(loadAni);
 			loadAni--;
 			if(loadAni == 0){
 				screen = 1;
@@ -1880,7 +1967,7 @@
 			
 		}
 		
-		function Button(x, y, w, h, action, oncolor, offcolor, name, fontSize, lvlPane, fontColor){
+		function Button(x, y, w, h, action, oncolor, offcolor, name, fontSize, lvlPane, fontColor, panelType){
 			this.x = x;
 			this.y = y;
 			this.w = w;
@@ -1890,13 +1977,20 @@
 			this.name = name;
 			this.lvlPane = lvlPane;
 			this.fontColor = fontColor;
+			this.panelType = panelType;
+			
 			
 			this.act = function(){
 				if(mouseX > this.x-(this.w/2) && mouseX < this.x+(this.w/2) && mouseY > this.y-(this.h/2) && mouseY < this.y+(this.h/2)){
 					cx.fillStyle = oncolor;
 					if(mouseup){
-						if(this.lvlPane != undefined && this.lvlPane != 0){
+						if(this.lvlPane != undefined && this.lvlPane != 0 && panelType == undefined){
 							this.lvlPane.playLevel();
+						} else if(this.lvlPane != undefined && this.lvPane != 0 && panelType == 1){
+							if(bought == 0){
+								this.lvlPane.click();
+								console.log(this.lvlPane.lvl);
+							}
 						} else {
 							this.action();
 						}
@@ -1953,14 +2047,170 @@
 			cx.fillText("TANKS", 450, 60);
 			playbutton = new Button(450, 150, 150, 50, function(){screen = 3;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Play", 30, 0, 'black');
 			settingsB = new Button(450, 225, 150, 50, function(){onSettings = true;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Settings", 30, 0, 'black');
+			storeB = new Button(450, 300, 150, 50, function(){instore = true;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Upgrades", 25, 0, 'black');
 			if(screen == 1){
 				playbutton.act();
 				settingsB.act();
+				storeB.act();
 			}
-			//console.log(screen);
+			////console.log(screen);
 			
 			
 		}
+		
+		function store(){
+			if(screen != 2){
+				if(backTheme == 0){
+					background(0, 130, 0);
+					cx.drawImage(grass, 0, 0, 900, 500);
+				}
+				if(backTheme == 1){
+					background(194, 178, 128);
+					cx.drawImage(sand, 0, 0, 900, 500);
+				}
+				if(backTheme == 2){
+					background(130, 130, 130);
+					cx.drawImage(rocky, 0, 0, 900, 500);
+				}
+				if(backTheme >= 3){
+					background(101, 67, 33);
+					cx.drawImage(forest, 0, 0, 900, 500);
+				}
+			} else {
+				if(currTheme == 0){
+					background(0, 130, 0);
+					cx.drawImage(grass, 0, 0, 900, 500);
+				}
+				if(currTheme == 1){
+					background(194, 178, 128);
+					cx.drawImage(sand, 0, 0, 900, 500);
+				}
+				if(currTheme == 2){
+					background(130, 130, 130);
+					cx.drawImage(rocky, 0, 0, 900, 500);
+				}
+				if(currTheme >= 3){
+					background(101, 67, 33);
+					cx.drawImage(forest, 0, 0, 900, 500);
+				}
+			}
+			
+			for(var p in upgradePanels){
+				upgradePanels[p].act();
+			}
+			(new Button(75, 465, 100, 30, function(){instore = false;}, 'rgb(173, 173, 255)', 'rgb(203, 203, 255)', "Back", 30, 0, 'black')).act();
+		}
+		var bought = 50;
+		var upgradePanels = [new upgradePanel(75, 30, 200, 200, (2/3), "pspeed", "Player Speed", [300, 400, 550], cons[0]), new upgradePanel(350, 30, 200, 200, 3, "pshotspeed", "Bullet Speed", [250, 350, 500], cons[1]), new upgradePanel(625, 30, 200, 200, 5, "preloadc", "Reload Time", [400, 450, 600], cons[2]), new upgradePanel(212.5, 270, 200, 200, 15, "pmaxhealth", "Max Health", [300, 500, 700], cons[3]), new upgradePanel(487.5, 270, 200, 200, 3, "pdamage", "Attack Power", [300, 400, 500], cons[4])];
+		function upgradePanel(x, y, w, h, upgrade, type, display, cost, min) { //speed, shotspeed, reload, health, damage
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+			this.type = type;
+			this.min = min;
+			
+			this.upgrade = upgrade;
+			this.max = this.min+(3*this.upgrade);
+			this.cost = cost;
+			this.display = display;
+			this.themeOn = Math.floor(lvlsPassed/lvlPerCampaign);
+			if(this.themeOn >= (levelPanels.length/lvlPerCampaign)){
+				this.themeOn -= 1;
+			}
+			this.lvl = Math.floor(((localStorage.getItem(type)-this.min)/(this.max-this.min))*3);
+			this.upgradeB = new Button(this.x+(this.w/2), this.y+150, 75, 25, this.click, themes[this.themeOn][1], themes[this.themeOn][2], "Upgrade", 15, this, 'black', 1);
+			this.tempValue = 0;
+			
+			
+			this.color = themes[this.themeOn][0];
+			this.draw = function(){
+				
+				cx.fillStyle = this.color;
+				cx.lineWidth = 3;
+				cx.strokeStyle = "black";
+				cx.fillRect(this.x, this.y, this.w, this.h);
+				cx.strokeRect(this.x, this.y, this.w, this.h);
+				cx.lineWidth = 1;
+				cx.textAlign = "center";
+				cx.textBaseline = "middle";
+				cx.fillStyle = "black";
+				cx.font = '17px GameFont';
+				cx.fillText(this.display, this.x+(this.w/2), this.y+20);
+				for(v = 0; v < 3; v++){
+					cx.strokeStyle = "black";
+					cx.fillStyle = "#7cfc00";
+					cx.lineWidth = 2;
+					cx.strokeRect((this.x+46)+(v*36), this.y+40, 36, 10); 
+					if(v+1 <= this.lvl){
+						cx.fillRect((this.x+46)+(v*36)+1, this.y+41, 34, 8); 
+					}
+				}
+				if(this.lvl < 3){
+					cx.lineWidth = 1;
+					this.upgradeB.act();
+					cx.fillStyle = "black";
+					
+					cx.fillText("Cost: $"+this.cost[this.lvl], this.x+(this.w/2), this.y+175);
+				} else {
+					cx.font = '25px GameFont';
+					cx.fillStyle = "#333";
+					cx.fillText("Upgrade", this.x+(this.w/2), this.y+125);
+					cx.fillText("Maxed Out!", this.x+(this.w/2), this.y+150);
+				}
+			}
+			
+			
+			this.click = function(){
+				if(bought == 0 && mouseup){
+					if(money >= this.cost[this.lvl]){
+						money -= this.cost[this.lvl];
+						moneyChanges.push(new moneyChange(this.cost[this.lvl], true));
+						this.tempValue = localStorage.getItem(this.type);
+						
+						localStorage.setItem(this.type, Number(this.tempValue)+Number(this.upgrade));
+						localStorage.setItem("money", money);
+						bought = 50;
+					}
+					
+					this.lvl = Math.floor(((localStorage.getItem(type)-this.min)/(this.max-this.min))*3);
+				}
+			}
+			
+			this.act = function(){
+				//this.click();
+				this.draw();
+				if(bought > 0){
+					bought--;
+				}
+			}
+			
+		}
+		
+		function moneyChange(value, neg){
+			this.duration = 100;
+			this.value = value;
+			this.neg = neg;
+			this.act = function(){
+				cx.textAlign = "right";
+				cx.textBaseline = "middle";
+				cx.font = '17px GameFont';
+				
+				if(this.neg){
+					cx.fillStyle = "#8b0000";
+					cx.fillText("-$"+this.value, 885, 30);
+				} else {
+					cx.fillStyle = "#008b00";
+					cx.fillText("+$"+this.value, 885, 30);
+				}
+				if(this.duration > 0){
+					this.duration--;
+				}
+				
+				
+			}
+		}
+		
 		var panelPerPage = 3;
 		var buffer = 25;
 		var panelW = (5*(900/panelPerPage))/6;
@@ -1979,7 +2229,7 @@
 			
 			this.ammoNum = ammoNum;
 			this.tankList = tankList;
-			//console.log(typeof(tankList)+", "+typeof(this.tankList));
+			////console.log(typeof(tankList)+", "+typeof(this.tankList));
 			
 			this.wallList = wallList;
 			this.ammoList = ammoList;
@@ -2006,7 +2256,7 @@
 				} else {
 					this.b = new Button(this.x+(-900*pageOn), this.y+200, 75, 25, this.playLevel, themes[this.themeOn][1], themes[this.themeOn][2], "Play", 15, this, 'white');
 				}
-				//console.log(typeof(this.tankList));
+				////console.log(typeof(this.tankList));
 				this.y = 75;
 				cx.save();
 				cx.translate(-900*pageOn, 0);
@@ -2017,6 +2267,10 @@
 				
 				
 				cx.fillRect(this.x-panelW/2, this.y, panelW, panelH);
+				cx.strokeStyle = "black";
+				cx.lineWidth = 3;
+				cx.strokeRect(this.x-panelW/2, this.y, panelW, panelH);
+				cx.lineWidth = 1;
 				if(this.themeOn <= 3){
 					cx.fillStyle = "black";
 				} else {
@@ -2060,9 +2314,9 @@
 			}
 			
 			this.playLevel = function(){
-				//console.log(typeof(this));
-				//console.log(this);
-				//console.log(typeof(this.tankList));
+				////console.log(typeof(this));
+				////console.log(this);
+				////console.log(typeof(this.tankList));
 				tanks = this.tankList;
 				
 				gameObjects = this.wallList;
@@ -2072,7 +2326,7 @@
 				
 				px = psx;
 				py = psy;
-				//console.log(px+", "+py);
+				////console.log(px+", "+py);
 				ammo = ammoNum;
 				ammoc = ammoNum;
 				screen = 2;
@@ -2087,7 +2341,23 @@
 		}
 		
 		var levelSelect = function(){
-			background(255, 255, 255);
+			backTheme = Math.floor(lvlsPassed/lvlPerCampaign);
+			if(backTheme == 0){
+				background(0, 130, 0);
+				cx.drawImage(grass, 0, 0, 900, 500);
+			}
+			if(backTheme == 1){
+				background(194, 178, 128);
+				cx.drawImage(sand, 0, 0, 900, 500);
+			}
+			if(backTheme == 2){
+				background(130, 130, 130);
+				cx.drawImage(rocky, 0, 0, 900, 500);
+			}
+			if(backTheme >= 3){
+				background(101, 67, 33);
+				cx.drawImage(forest, 0, 0, 900, 500);
+			}
 			for(var v in levelPanels){
 				levelPanels[v].draw();
 			}
@@ -2384,6 +2654,10 @@
 			
 			
 			}
+			if(instore == true){
+				store();
+				
+			}
 			if(onSettings == true){
 				settings();
 			}
@@ -2401,10 +2675,29 @@
 			if(songon == songs.length){
 				songon = 0;
 			}
+			cx.textAlign = "right";
+			cx.textBaseline = "middle";
+			cx.fillStyle = "black";
+			cx.font = '17px GameFont';
+			cx.fillText("$"+money, 885, 15);
+			for(mc = 0; mc < moneyChanges.length; mc++){
+				console.log(moneyChanges[mc]);
+				moneyChanges[mc].act();
+				
+				if(moneyChanges[mc].duration == 0){
+					moneyChanges.splice(mc, 1);
+				}
+			}
+			pspeed = localStorage.getItem("pspeed");
+			preloadc = localStorage.getItem("preloadc");
+			pmaxhealth = localStorage.getItem("pmaxhealth");
+			pshotspeed = localStorage.getItem("pshotspeed");
+			pdamage = localStorage.getItem("pdamage");
+			
 			cx.font = '13px GameFont';
 			cx.fillText(mouseX+", "+mouseY, 50, 400);
 			cx.fillText(Math.round(songs[songon].currentTime)+"/"+Math.round(songs[songon].duration), 50, 420);
-			console.log(songs[songon].volume);
+			////console.log(songs[songon].volume);
 			mouseup = false;
 		}
 		setInterval(screenFunction, 20);
