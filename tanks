@@ -47,9 +47,7 @@
 		var cons = [5, 10, 65, 100, 5];
 		
 		localStorage.setItem("money", 10000);
-		var money = localStorage.getItem("money");
-		console.log(typeof(money));
-		money = Number(money);
+		
 		if(money == undefined){
 			money = 0;
 		}
@@ -57,29 +55,41 @@
 		var instore = false;
 		var moneyPerLevel = 200;
 		var moneyPerRepeat = 10;
-		
-		
-	//	localStorage.setItem("pspeed", 5);
+		function restoreDefaultPlayerStats(){
+			localStorage.setItem("pspeed", cons[0]);
+			localStorage.setItem("pshotspeed", cons[1]);
+			localStorage.setItem("preloadc", cons[2]);
+			localStorage.setItem("pmaxhealth", cons[3]);
+			localStorage.setItem("pdamage", cons[4]);
+			localStorage.setItem("lvlsPassed", 0);
+			localStorage.setItem("money", 0);
+			
+		}
+		restoreDefaultPlayerStats();
+		var money = localStorage.getItem("money");
+		console.log(typeof(money));
+		money = Number(money);
+	//	
 		var pspeed = localStorage.getItem("pspeed"); 
 		if(pspeed == undefined){
 			pspeed = cons[0];
 		}
-	//	localStorage.setItem("pshotspeed", cons[1]);
+	//	
 		var pshotspeed = localStorage.getItem("pshotspeed");
 		if(pshotspeed == undefined){
 			pshotspeed = cons[1];
 		}
-	//	localStorage.setItem("preloadc", cons[2]);
+	//	
 		var preloadc = localStorage.getItem("preloadc");
 		if(preloadc == undefined){
 			preloadc = cons[2];
 		}
-		localStorage.setItem("pmaxhealth", cons[3]);
+		
 		var pmaxhealth = localStorage.getItem("pmaxhealth");
 		if(pmaxhealth == undefined){
 			pmaxhealth = cons[3];
 		}
-	//	localStorage.setItem("pdamage", cons[4]);
+	//	
 		var pdamage = localStorage.getItem("pdamage");
 		if(pdamage == undefined){
 			pdamage = cons[4];
