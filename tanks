@@ -42,8 +42,8 @@
 		var cx = canvas.getContext("2d");
 		var prot = 0;
 		
-		var menuPx = 375;
-		var menuPy = 300;
+		var menuPx = 300;
+		var menuPy = 250;
 		var cons = [5, 10, 65, 100, 5];
 		
 		localStorage.setItem("money", 10000);
@@ -73,26 +73,31 @@
 		var pspeed = localStorage.getItem("pspeed"); 
 		if(pspeed == undefined){
 			pspeed = cons[0];
+			localStorage.setItem("pspeed", pspeed);
 		}
 	//	
 		var pshotspeed = localStorage.getItem("pshotspeed");
 		if(pshotspeed == undefined){
 			pshotspeed = cons[1];
+			localStorage.setItem("pshotspeed", pshotspeed);
 		}
 	//	
 		var preloadc = localStorage.getItem("preloadc");
 		if(preloadc == undefined){
 			preloadc = cons[2];
+			localStorage.setItem("preloadc", preloadc);
 		}
-		
+
 		var pmaxhealth = localStorage.getItem("pmaxhealth");
 		if(pmaxhealth == undefined){
 			pmaxhealth = cons[3];
+			localStorage.setItem("pmaxhealth", pmaxhealth);
 		}
 	//	
 		var pdamage = localStorage.getItem("pdamage");
 		if(pdamage == undefined){
 			pdamage = cons[4];
+			localStorage.setItem("pdamage", pdamage);
 		}
 		var preload = preloadc;
 		
@@ -121,7 +126,7 @@
 		
 		//localStorage.setItem("lvlsPassed", 0);
 		var lvlsPassed = localStorage.getItem('lvlsPassed');
-		lvlsPassed = 0;
+		//lvlsPassed = 0;
 		
 		//var lvlsPassed = 0;
 		if(lvlsPassed == undefined){
@@ -180,11 +185,11 @@
 		var lvlPerCampaign = 2;
 		
 		initLevel();
-		function initLevel() {
+		function initLevel() { //tank wall ammo health mine
 			tutorial = [[new Tank(800, 225, 0, true), new Tank(850, 350, 1, true)], [new Wall(150,150, 25, 200)], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], [], []]; 
 			levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400), new AmmoPack(750, 200), new AmmoPack(50, 50)], [new HealthPack(450, 450)], [new Mine(300, 350)]];
-			levelTwo = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450), new Tank(500, 600), new Tank(100, -100), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
-		    levelThree = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
+			levelTwo = [[new Tank(850, 450), new Tank(850, 50),  new Tank(50, 450), new Tank(500, 600), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
+		    levelThree = [[new Tank(50, 30), new Tank(600, 250), new Tank(400, 125), new Tank(780, 450), new Tank(800, 20), new Tank(125, 450), new Tank(25, 590)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [new HealthPack(10,10)], []]
 			levelFour = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 			levelFive = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 			levelSix = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
@@ -197,17 +202,17 @@
 			pos = 1;
 			levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
 			pos = 2;
-			levelPanels[pos] = new LevelPanel(pos, 8, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
+			levelPanels[pos] = new LevelPanel(pos, 5, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
 			pos = 3;
-			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, 7, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 4;
-			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, 7, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 5;
 			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 6;
 			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 7;
-			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, 11, 30, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			
 
 		}
@@ -1196,7 +1201,7 @@
 				for(e = 0; e < shells.length; e++){
 					if(shells[e].exploding == 1){
 						if(dist(shells[e].x, shells[e].y, this.x, this.y) <= shells[e].rad*0.5 && this.recover == 0){
-							this.health -= damage;
+							this.health -= pdamage;
 							this.recover = this.recoverc;
 							cx.fillStyle = "black";
 							
@@ -1764,8 +1769,10 @@
 				cx.fillStyle = "black";
 				cx.font = '20px GameFont';
 				cx.textAlign = 'center';
-				cx.fillText("Move with WASD", 450, 150);
-				cx.fillText("Use your cursor to aim", 450, 200);
+				cx.fillText("Move with " + keyCodes[fKey] + " and " + keyCodes[bKey], 450, canvas.height/2-70);
+				cx.fillText("Rotate with " + keyCodes[lKey] + " and " + keyCodes[rKey], 450, canvas.height/2-40);
+				cx.fillText("Use your cursor to aim", 450, canvas.height/2+40);
+				cx.fillText("Click to shoot", 450, canvas.height/2+70);
 			}
 			
 			for(t = 0; t < ammoPacks.length; t++){
@@ -2062,11 +2069,12 @@
 				playbutton.act();
 				settingsB.act();
 				storeB.act();
+
 			}
-			////console.log(screen);
-			
-			
+
 		}
+			
+		
 		
 		function store(){
 			if(screen != 2){
@@ -2698,11 +2706,11 @@
 					moneyChanges.splice(mc, 1);
 				}
 			}
-			pspeed = localStorage.getItem("pspeed");
+			/*pspeed = localStorage.getItem("pspeed");
 			preloadc = localStorage.getItem("preloadc");
 			pmaxhealth = localStorage.getItem("pmaxhealth");
 			pshotspeed = localStorage.getItem("pshotspeed");
-			pdamage = localStorage.getItem("pdamage");
+			pdamage = localStorage.getItem("pdamage");*/ //upgrades set undefined by this
 			
 			cx.font = '13px GameFont';
 			cx.fillText(mouseX+", "+mouseY, 50, 400);
