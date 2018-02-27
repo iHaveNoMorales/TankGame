@@ -46,7 +46,7 @@
 		var menuPy = 250;
 		var cons = [5, 10, 65, 100, 5];
 		
-		localStorage.setItem("money", 10000);
+	//	localStorage.setItem("money", 10000);
 		
 		if(money == undefined){
 			money = 0;
@@ -54,7 +54,7 @@
 		var moneyChanges = [];
 		var instore = false;
 		var moneyPerLevel = 200;
-		var moneyPerRepeat = 10;
+		var moneyPerRepeat = 100;
 		function restoreDefaultPlayerStats(){
 			localStorage.setItem("pspeed", cons[0]);
 			localStorage.setItem("pshotspeed", cons[1]);
@@ -65,7 +65,7 @@
 			localStorage.setItem("money", 0);
 			
 		}
-		restoreDefaultPlayerStats();
+		//restoreDefaultPlayerStats();
 		var money = localStorage.getItem("money");
 		console.log(typeof(money));
 		money = Number(money);
@@ -81,6 +81,7 @@
 			pshotspeed = cons[1];
 			localStorage.setItem("pshotspeed", pshotspeed);
 		}
+		localStorage.setItem("lvlsPassed", 3);
 	//	
 		var preloadc = localStorage.getItem("preloadc");
 		if(preloadc == undefined){
@@ -600,7 +601,7 @@
 			this.y = y;
 			this.rot = 0;
 			this.blocked = false;
-			this.speed = 1*((difficulty/2));
+			this.speed = 1.5*((difficulty/2));
 			this.targ = new Point(px, py);
 			this.tempPath = false;
 			this.pathTimer = 0;
@@ -711,6 +712,7 @@
 			
 			this.think = function(){
 				if(this.t == false){
+					
 					this.getP();
 					this.blocked = this.checkObj(gameObjects, Math.atan2(this.targ.y-this.y, this.targ.x-this.x));
 					if(!this.tempPath){
@@ -719,8 +721,21 @@
 						}
 					}
 					this.hurt();
-					if(!(this.x > 0 || this.x <= 0)){
+					if(this.p == tanks.length-1){
+						//console.log(this.x+", "+this.y);
+					}
+					if(this.rot == undefined){
+						/*console.log(this);
+						
+						
+						
+						console.log(this.x+", "+this.y);
+						console.log(this.targ.x+", "+this.targ.x);
+						
+						console.log(Math.cos(this.rot)*this.speed*timeScale+", "+Math.sin(this.rot)*this.speed*timeScale);*/
+						console.log("removing tank");
 						tanks.splice(this.p, 1);
+						return;
 					}
 					if(!this.formation){
 						this.targ = new Point(px, py);
@@ -728,6 +743,8 @@
 					
 					this.swarm();
 					if(!this.blocked){
+						this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
+						
 						if(!this.formation){
 							if(dist(this.x, this.y, this.targ.x, this.targ.y) > 100){
 								this.x += Math.cos(this.rot)*this.speed*timeScale;
@@ -742,13 +759,15 @@
 								this.y += Math.sin(this.rot)*this.speed*timeScale;
 							}
 						}
-						this.rot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x);
+						
+						
 						this.tempPath = false;
 					}
 					
 					if(this.blocked && !this.tempPath){
 						this.pathFind();
 					}
+					
 					if(this.tempPath){
 							
 								this.x += Math.cos(this.rot)*this.speed*timeScale;
@@ -758,10 +777,14 @@
 						if(this.pathTimer == 0){
 							this.pathFind();
 						}
+						if(this.rot == undefined || this.x == undefined){
+							console.log(this.p+"AAAA"+this.rot+", "+this.x);
+						}
 						if(this.pathTimer > 0){
 							this.pathTimer-=timeScale;
 						}
 					}
+					
 				}
 				else{
 					this.hurt();
@@ -890,7 +913,12 @@
 					this.pathTimer = 5;
 					this.tempPath = true;
 				} else {
+					
 					this.rot = degrees[minpos];
+					if(this.tempPath){
+						console.log(minpos+", "+degrees[minpos]);
+					}
+					
 				}
 				
 				this.pathTimer = this.pathcheckConstant; //resetting countdown
@@ -975,7 +1003,7 @@
 			this.srot = Math.atan2(this.targ.y-this.y, this.targ.x-this.x); //smooth rotation;
 			this.turnVel = 0.04;
 			this.formation = enemyForm;
-			this.shotSpeed = 10*((difficulty)/2);
+			this.shotSpeed = 15*((difficulty)/2);
 			this.reload = 65;
 			this.reloading = Math.floor(Math.random()*this.reload);
 			
@@ -1071,10 +1099,10 @@
 						
 						this.targ = new Point(px+(180*Math.cos((this.tr*Math.PI)/180)), py+(180*Math.sin((this.tr*Math.PI)/180)));
 					} else {
-						this.tr+=5;
+						this.tr = Math.floor(Math.random()*361);
 						this.targ = new Point(px+(180*Math.cos((this.tr*Math.PI)/180)), py+(180*Math.sin((this.tr*Math.PI)/180)));
 					}
-					this.tr+=5;
+					this.tr = Math.floor(Math.random()*361);;
 					if(this.tr >= 360){
 						this.tr = 0;
 					}
@@ -1281,6 +1309,7 @@
 					this.tempPath = true;
 				} else {
 					this.rot = degrees[minpos];
+					
 				}
 				
 				this.pathTimer = this.pathcheckConstant; //resetting countdown
@@ -1431,6 +1460,8 @@
 			this.target = target;
 			this.exploding = 0;
 			this.isplayer = play;
+			this.maxdistc = 250;
+			this.maxdist = this.maxdistc;
 			this.draw = function(){
 				cx.save();
 				cx.translate(this.x, this.y);
@@ -1449,15 +1480,19 @@
 			this.act = function(){
 				this.distance = dist(this.ox, this.oy, this.x, this.y);
 				if(this.exploding == 0){
-					this.move();
+					if(!paused){
+						this.move();
+					}
 					this.draw();
 					
 					
 				} else if(this.exploding == 1){
-					this.explode();
+					if(!paused){
+						this.explode();
+					}
 				}
 				if(!play){
-					if((dist(this.x, this.y, this.target.x, this.target.y) < 35 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
+					if((dist(this.x, this.y, this.target.x, this.target.y) < 35 && this.exploding == 0) || (this.distance > this.maxdist+100 && this.exploding == 0)){
 						this.exploding = 1;
 						expAudio[expAudioOn].play();
 						expAudioOn++;
@@ -1466,6 +1501,7 @@
 						}
 					}
 				} else {
+					this.maxdist = this.maxdistc*(pshotspeed/upgradePanels[2].max); 
 					if(tanks.length == 0 && (this.distance > 250 && this.exploding == 0)){
 						this.exploding = 1;
 						expAudio[expAudioOn].play();
@@ -1475,7 +1511,7 @@
 						}
 					}
 					for(o = 0; o < tanks.length; o++){
-						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 35 && this.exploding == 0) || (this.distance > 250 && this.exploding == 0)){
+						if((dist(this.x, this.y, tanks[o].x, tanks[o].y) < 35 && this.exploding == 0) || (this.distance > this.maxdist && this.exploding == 0)){
 							this.exploding = 1;
 							expAudio[expAudioOn].play();
 						expAudioOn++;
@@ -1631,7 +1667,8 @@
 			
 			for(q = 0; q < shells.length; q++){
 				if(shells[q].exploding == 1){
-					if(dist(shells[q].x, shells[q].y, px, py) <= shells[q].rad*0.5 && precover == 0){
+					
+					if(dist(shells[q].x, shells[q].y, px, py) <= shells[q].rad && precover == 0){
 
 						phealth -= 10;
 						precover = precoverc;
@@ -1641,7 +1678,7 @@
 			
 			for(q = 0; q < mines.length; q++){
 				if(mines[q].exploding == 1){
-					if(dist(mines[q].x, mines[q].y, px, py) <= mines[q].rad*0.5 && precover == 0){
+					if(dist(mines[q].x, mines[q].y, px, py) <= mines[q].rad && precover == 0){
 
 						phealth -= 10;
 						precover = precoverc;
@@ -1707,7 +1744,7 @@
 			}
 			this.act = function(){
 				if(this.pickedUp()){
-					phealth+=10;
+					phealth+=(pmaxhealth*0.2);
 				}
 				if(phealth > pmaxhealth){
 					phealth = pmaxhealth;
@@ -1801,7 +1838,7 @@
 					
 				}
 				tanks[h].act(); 
-				if(tanks[h].health <= 0){
+				if(tanks[h] != undefined && tanks[h].health <= 0){
 					
 					tanks.splice(h, 1);
 					if(tanks.length > 0){
@@ -1869,9 +1906,18 @@
 			}
 			if(!levelCompleted && tanks.length == 0){
 				if(lvlsPassed <= lvl){
+					if(lvl == 0){
+						money += (moneyPerLevel*2.5);
+						moneyChanges.push(new moneyChange(moneyPerLevel*2.5, false));
+					} else {
+						money += moneyPerLevel;
+						moneyChanges.push(new moneyChange(moneyPerLevel, false));
+					}
 					lvlsPassed = lvl+1;
-					money += moneyPerLevel;
-					moneyChanges.push(new moneyChange(moneyPerLevel, false));
+					
+						
+					
+					
 				} else {
 					money += moneyPerRepeat;
 					moneyChanges.push(new moneyChange(moneyPerRepeat, false));
@@ -1909,7 +1955,9 @@
 			cx.fillText("Level Passed!", 450, 100);
 			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1; onSettings = false;}, themes[currTheme][1], themes[currTheme][2], "Menu", 15, 0, "black")).act();
 			(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
+			(new Button(450, 295, 125, 50, function(){instore = true;}, themes[currTheme][1], themes[currTheme][2], "Upgrades", 15, 0, "black")).act();
 		}
+		
 		
 		var deathScreen = function(){
 			if(dsplayed==false){
@@ -2679,6 +2727,9 @@
 			if(onSettings == true){
 				settings();
 			}
+			if(songon == songs.length){
+				songon = 0;
+			}
 			if(keys[78] && Math.floor(songs[songon].currentTime) > 0){
 				songs[songon].currentTime = songs[songon].duration;
 				
@@ -2690,9 +2741,7 @@
 			
 			songs[songon].play();
 			
-			if(songon == songs.length){
-				songon = 0;
-			}
+			
 			cx.textAlign = "right";
 			cx.textBaseline = "middle";
 			cx.fillStyle = "black";
@@ -2706,11 +2755,11 @@
 					moneyChanges.splice(mc, 1);
 				}
 			}
-			/*pspeed = localStorage.getItem("pspeed");
+			pspeed = localStorage.getItem("pspeed");
 			preloadc = localStorage.getItem("preloadc");
 			pmaxhealth = localStorage.getItem("pmaxhealth");
 			pshotspeed = localStorage.getItem("pshotspeed");
-			pdamage = localStorage.getItem("pdamage");*/ //upgrades set undefined by this
+			pdamage = localStorage.getItem("pdamage"); //upgrades set undefined by this
 			
 			cx.font = '13px GameFont';
 			cx.fillText(mouseX+", "+mouseY, 50, 400);
