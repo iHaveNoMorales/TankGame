@@ -196,8 +196,10 @@
 			levelTwo = [[new Tank(850, 450), new Tank(850, 50),  new Tank(50, 450), new Tank(500, 600), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 		    levelThree = [[new Tank(50, 30), new Tank(600, 250), new Tank(400, 125), new Tank(780, 450), new Tank(800, 20), new Tank(125, 450), new Tank(25, 590)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [new HealthPack(10,10)], []]
 			levelFour = [[new Tank(550, 10), new Tank(870, 30), new Tank(10,380), new Tank(220, 250), new Tank(700, 150), new Tank(870, 480), new Tank(700, 400)],[new Wall(100, 100, 25, 300), new Wall(800, 100, 25, 300), new Wall(450, 50, 50, 400)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], [new Mine(250, 300), new Mine(850, 100)]]
+
 			levelFive = [[new Tank(550, 10), new Tank(800, 100), new Tank(450, 0), new Tank(0, 400), new Tank(800, 400), new Tank(100, -100), new Tank(300, -100), new Tank(500, -100), new Tank(700, -100)],[],[new AmmoPack(850, 50), new AmmoPack(300, 300), new AmmoPack(700, 400)], [new HealthPack(730, 370)], [new Mine(30, 200), new Mine(450, 250), new Mine(830, 300), new Mine(10, 450)]]
-			levelSix = [[new Tank(550, 10)],[new Wall(50, 225, 800, 50)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
+	levelSix = [[new Tank(550, 10), new Tank(30, 40), new Tank(870, 20), new Tank(40, 450), new Tank(890, 490), new Tank(250, 130), new Tank(600, 140), new Tank(450, 495)],[new Wall(50, 225, 800, 50)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
+
 			levelSeven = [[new Boss(800, 100)], [], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], [], []];
 			//new Wall(150,150, 25, 200)
 			levels = [tutorial, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven]; //tank wall ammo health
@@ -205,19 +207,19 @@
 			pos = 0;
 			levelPanels[pos] = new LevelPanel(pos, 1, 0, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 50, 225);
 			pos = 1;
-			levelPanels[pos] = new LevelPanel(pos, 4, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
+			levelPanels[pos] = new LevelPanel(pos, levelOne[0].length, 10, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
 			pos = 2;
-			levelPanels[pos] = new LevelPanel(pos, 5, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
+			levelPanels[pos] = new LevelPanel(pos, levelTwo[0].length, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 200, 200);
 			pos = 3;
-			levelPanels[pos] = new LevelPanel(pos, 7, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, levelThree[0].length, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 4;
-			levelPanels[pos] = new LevelPanel(pos, 7, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 0, 0);
+			levelPanels[pos] = new LevelPanel(pos, levelFour[0].length, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 0, 0);
 			pos = 5;
-			levelPanels[pos] = new LevelPanel(pos, 5, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, levelFive[0].length, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 6;
-			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, levelSix[0].length, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 7;
-			levelPanels[pos] = new LevelPanel(pos, 11, 30, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, 1, 30, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			
 
 		}
