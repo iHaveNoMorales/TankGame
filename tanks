@@ -46,15 +46,16 @@
 		var menuPy = 250;
 		var cons = [5, 10, 65, 100, 5];
 		
+
 	//	localStorage.setItem("money", 10000);
+
 		
-		if(money == undefined){
-			money = 0;
-		}
+		
 		var moneyChanges = [];
 		var instore = false;
-		var moneyPerLevel = 200;
+		var moneyPerLevel = 250;
 		var moneyPerRepeat = 100;
+		var moneyPerKill = 20;
 		function restoreDefaultPlayerStats(){
 			localStorage.setItem("pspeed", cons[0]);
 			localStorage.setItem("pshotspeed", cons[1]);
@@ -67,6 +68,9 @@
 		}
 		//restoreDefaultPlayerStats();
 		var money = localStorage.getItem("money");
+		if(money == undefined){
+			localStorage.setItem("money", 0);
+		}
 		console.log(typeof(money));
 		money = Number(money);
 	//	
@@ -81,7 +85,7 @@
 			pshotspeed = cons[1];
 			localStorage.setItem("pshotspeed", pshotspeed);
 		}
-		localStorage.setItem("lvlsPassed", 3);
+		localStorage.setItem("lvlsPassed", 6);
 	//	
 		var preloadc = localStorage.getItem("preloadc");
 		if(preloadc == undefined){
@@ -110,7 +114,7 @@
 		var textVal = document.getElementById("input").value;
 		
 		var phealth = pmaxhealth;
-		var precoverc = 50;
+		var precoverc = 30;
 		var precover = 0;
 		var fc = 0;
 		var ammo = 10;
@@ -191,9 +195,9 @@
 			levelOne = [[new Tank(850, 450), new Tank(850, 50), new Tank(50, 50), new Tank(50, 450)],[new Wall(100, 100, 25, 150), new Wall(250, 75, 150, 25), new Wall(500, 100, 200, 200)],[new AmmoPack(400, 400), new AmmoPack(750, 200), new AmmoPack(50, 50)], [new HealthPack(450, 450)], [new Mine(300, 350)]];
 			levelTwo = [[new Tank(850, 450), new Tank(850, 50),  new Tank(50, 450), new Tank(500, 600), new Tank(950, -50)],[new Wall(125, 400, 650, 25), new Wall(325, 50, 250, 250)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 		    levelThree = [[new Tank(50, 30), new Tank(600, 250), new Tank(400, 125), new Tank(780, 450), new Tank(800, 20), new Tank(125, 450), new Tank(25, 590)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [new HealthPack(10,10)], []]
-			levelFour = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
-			levelFive = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
-			levelSix = [[new Tank(550, 10)],[new Wall(87.5, 100, 25, 300), new Wall(787.5, 100, 25, 300), new Wall(200, 50, 500, 25), new Wall(200, 425, 500, 25), new Wall(375, 175, 150, 150)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
+			levelFour = [[new Tank(550, 10), new Tank(870, 30), new Tank(10,380), new Tank(220, 250), new Tank(700, 150), new Tank(870, 480), new Tank(700, 400)],[new Wall(100, 100, 25, 300), new Wall(800, 100, 25, 300), new Wall(450, 50, 50, 400)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], [new Mine(250, 300), new Mine(850, 100)]]
+			levelFive = [[new Tank(550, 10), new Tank(800, 100), new Tank(450, 0), new Tank(0, 400), new Tank(800, 400), new Tank(100, -100), new Tank(300, -100), new Tank(500, -100), new Tank(700, -100)],[],[new AmmoPack(850, 50), new AmmoPack(300, 300), new AmmoPack(700, 400)], [new HealthPack(730, 370)], [new Mine(30, 200), new Mine(450, 250), new Mine(830, 300), new Mine(10, 450)]]
+			levelSix = [[new Tank(550, 10)],[new Wall(50, 225, 800, 50)],[new AmmoPack(850, 50), new AmmoPack(300, 300)], [], []]
 			levelSeven = [[new Boss(800, 100)], [], [new AmmoPack(200, 225), new AmmoPack(800, 50), new AmmoPack(800, 400)], [], []];
 			//new Wall(150,150, 25, 200)
 			levels = [tutorial, levelOne, levelTwo, levelThree, levelFour, levelFive, levelSix, levelSeven]; //tank wall ammo health
@@ -207,9 +211,9 @@
 			pos = 3;
 			levelPanels[pos] = new LevelPanel(pos, 7, 25, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 4;
-			levelPanels[pos] = new LevelPanel(pos, 7, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, 7, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 0, 0);
 			pos = 5;
-			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
+			levelPanels[pos] = new LevelPanel(pos, 5, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 6;
 			levelPanels[pos] = new LevelPanel(pos, 11, 20, levels[pos][0], levels[pos][1], levels[pos][2], levels[pos][3], levels[pos][4], 450, 350);
 			pos = 7;
@@ -243,7 +247,7 @@
 
 		var numTanks = 14; 
 		
-		var screen = 1;
+		var screen = 0;
 
 		var mouseX;
 		var mouseY;
@@ -274,8 +278,10 @@
 		var expAudioOn = 0;
 		
 		for(var aud in expAudio){
-			expAudio[aud].volume = 0.1;
+			expAudio[aud].volume = 0.5;
 		}
+		
+		
 		var uDied = new Audio('youDied.mp3');
 		var dsplayed = false;
 		
@@ -288,12 +294,13 @@
 		var song7 = new Audio('Centurion Full Track.wav');
 		var song8 = new Audio('Stealth Full Track.wav');
 		
-		var songs = [song1, song2, song3, song4, song5, song6, song7, song8];
+		var songs = [song2, song3, song4, song5, song6, song7, song8];
 		for(var audio in songs){
 			songs[audio].volume = volume;
 			//console.log(songs[audio].src);
 		}
 		songs = shuffle(songs);
+		songs.unshift(song1);
 		
 		for(var audio in songs){
 			
@@ -1501,7 +1508,7 @@
 						}
 					}
 				} else {
-					this.maxdist = this.maxdistc*(pshotspeed/upgradePanels[2].max); 
+					this.maxdist = this.maxdistc*(1+(pshotspeed/upgradePanels[2].max)); 
 					if(tanks.length == 0 && (this.distance > 250 && this.exploding == 0)){
 						this.exploding = 1;
 						expAudio[expAudioOn].play();
@@ -1841,6 +1848,9 @@
 				if(tanks[h] != undefined && tanks[h].health <= 0){
 					
 					tanks.splice(h, 1);
+					money += moneyPerKill;
+					moneyChanges.push(new moneyChange(moneyPerKill, false));
+					localStorage.setItem("money", money);
 					if(tanks.length > 0){
 						h--;
 					}
@@ -1953,9 +1963,11 @@
 			}
 			cx.textAlign = "center";
 			cx.fillText("Level Passed!", 450, 100);
-			(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1; onSettings = false;}, themes[currTheme][1], themes[currTheme][2], "Menu", 15, 0, "black")).act();
-			(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
-			(new Button(450, 295, 125, 50, function(){instore = true;}, themes[currTheme][1], themes[currTheme][2], "Upgrades", 15, 0, "black")).act();
+			if(!instore){
+				(new Button(450, 175, 125, 50, function(){levelCompleted = false; screen = 1; onSettings = false;}, themes[currTheme][1], themes[currTheme][2], "Menu", 15, 0, "black")).act();
+				(new Button(450, 235, 125, 50, function(){levelCompleted = false; screen = 3; clickDelay = 25;}, themes[currTheme][1], themes[currTheme][2], "Level Select", 15, 0, "black")).act();
+				(new Button(450, 295, 125, 50, function(){instore = true;}, themes[currTheme][1], themes[currTheme][2], "Upgrades", 15, 0, "black")).act();
+			}
 		}
 		
 		
@@ -1995,24 +2007,31 @@
 		}
 		
 		var loadAni = 500;
+		var exspeed = 35;
 		function loading(){
 			background(255, 255, 255);
+			cx.drawImage(grass, 0, 0, 900, 500);
 			////console.log(loadAni);
 			loadAni--;
-			if(loadAni == 0){
+			if(loadAni == -50){
 				screen = 1;
+				fc = 0;
+				for(var aud in expAudio){
+					expAudio[aud].volume = 0.1;
+				}
 			}
 			cx.font = '40px GameFont';
 			cx.fillStyle = 'rgb(50, 0, 0)';
 			cx.textAlign = 'center';
-			cx.fillText('Tanks', 450, 200);
+			cx.textBaseline = 'middle';
+			cx.fillText('Tanks', 450, 185);
 			cx.fillStyle = "white";
 			wide = cx.measureText('Tanks').width;
 			if(900-((loadAni-200)*5) < 450-wide/2){
-				cx.fillRect(450-wide/2, 150, wide, 100);
+				cx.drawImage(grass, 450-wide/2, 150, wide, 100, 450-wide/2, 150, wide, 100);
 			} else {
 				fc++;
-				cx.fillRect(450-wide/2+(fc*5), 150, wide, 100);
+				cx.drawImage(grass, 450-wide/2+(fc*5), 150, wide, 100, 450-wide/2+(fc*5), 150, wide, 100);
 			}
 			if(loadAni < 390 && loadAni > 195){
 				cx.save();
@@ -2022,9 +2041,49 @@
 				cx.drawImage(pCannon, -25, -25, 50, 50);
 				cx.restore();
 			}
-			if(loadAni < 110){
-				screen = 1;
-				fc = 0;
+			if(loadAni == 250){
+				songs[songon].play();
+			}
+			if(loadAni < 195){
+				cx.save();
+				cx.translate(450, 250);
+				exp1.play();
+				
+				
+				
+				cx.drawImage(explosion, -0.5*(195-loadAni)*exspeed, -0.5*((6/5)*(195-loadAni)*exspeed), (195-loadAni)*exspeed, (6/5)*(195-loadAni)*exspeed);
+				cx.restore();
+				if(loadAni < 165){
+					cx.save();
+					cx.translate(250, 100);
+					exp2.play();
+					
+				
+				
+				cx.drawImage(explosion, -0.5*(165-loadAni)*exspeed, -0.5*((6/5)*(165-loadAni)*exspeed), (165-loadAni)*exspeed, (6/5)*(165-loadAni)*exspeed);
+				cx.restore();
+				}
+				if(loadAni < 135){
+					cx.save();
+					cx.translate(650, 450);
+					exp3.play();
+				
+				
+				cx.drawImage(explosion, -0.5*(135-loadAni)*exspeed, -0.5*((6/5)*(135-loadAni)*exspeed), (135-loadAni)*exspeed, (6/5)*(135-loadAni)*exspeed);
+				cx.restore();
+				}
+				if(loadAni < 105){
+					cx.save();
+					cx.translate(500, 220);
+				
+				
+				cx.drawImage(explosion, -0.5*(105-loadAni)*exspeed, -0.5*((6/5)*(105-loadAni)*exspeed), (105-loadAni)*exspeed, (6/5)*(105-loadAni)*exspeed);
+				cx.restore();
+				}
+			}
+			if(loadAni < 25){
+				background(0, 0, 0);
+				
 			}
 			
 			
@@ -2184,6 +2243,10 @@
 			if(this.themeOn >= (levelPanels.length/lvlPerCampaign)){
 				this.themeOn -= 1;
 			}
+			if(screen == 2){
+				
+				this.themeOn = Math.floor(lvl/lvlPerCampaign);
+			}
 			this.lvl = Math.floor(((localStorage.getItem(type)-this.min)/(this.max-this.min))*3);
 			this.upgradeB = new Button(this.x+(this.w/2), this.y+150, 75, 25, this.click, themes[this.themeOn][1], themes[this.themeOn][2], "Upgrade", 15, this, 'black', 1);
 			this.tempValue = 0;
@@ -2191,7 +2254,12 @@
 			
 			this.color = themes[this.themeOn][0];
 			this.draw = function(){
-				
+				if(screen == 2){
+					this.themeOn = Math.floor(lvl/lvlPerCampaign);
+				}
+				this.color = themes[this.themeOn][0];
+				this.upgradeB = new Button(this.x+(this.w/2), this.y+150, 75, 25, this.click, themes[this.themeOn][1], themes[this.themeOn][2], "Upgrade", 15, this, 'black', 1);
+			
 				cx.fillStyle = this.color;
 				cx.lineWidth = 3;
 				cx.strokeStyle = "black";
@@ -2257,17 +2325,23 @@
 			this.duration = 100;
 			this.value = value;
 			this.neg = neg;
+			this.pos = 0;
 			this.act = function(){
+				for(var mch in moneyChanges){
+					if(moneyChanges[mch].duration == this.duration && moneyChanges[mch].value == this.value){
+						this.pos = mch;
+					}
+				}
 				cx.textAlign = "right";
 				cx.textBaseline = "middle";
 				cx.font = '17px GameFont';
 				
 				if(this.neg){
 					cx.fillStyle = "#8b0000";
-					cx.fillText("-$"+this.value, 885, 30);
+					cx.fillText("-$"+this.value, 885, 30+(this.pos*17));
 				} else {
-					cx.fillStyle = "#008b00";
-					cx.fillText("+$"+this.value, 885, 30);
+					cx.fillStyle = "#00cb00";
+					cx.fillText("+$"+this.value, 885, 30+(this.pos*17));
 				}
 				if(this.duration > 0){
 					this.duration--;
@@ -2275,6 +2349,7 @@
 				
 				
 			}
+			
 		}
 		
 		var panelPerPage = 3;
@@ -2739,14 +2814,17 @@
 				songon++;
 			}
 			
-			songs[songon].play();
+			if(screen > 0){
+				
 			
 			
-			cx.textAlign = "right";
-			cx.textBaseline = "middle";
-			cx.fillStyle = "black";
-			cx.font = '17px GameFont';
-			cx.fillText("$"+money, 885, 15);
+			
+				cx.textAlign = "right";
+				cx.textBaseline = "middle";
+				cx.fillStyle = "black";
+				cx.font = '17px GameFont';
+				cx.fillText("$"+money, 885, 15);
+			}
 			for(mc = 0; mc < moneyChanges.length; mc++){
 				console.log(moneyChanges[mc]);
 				moneyChanges[mc].act();
