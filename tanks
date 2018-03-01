@@ -90,7 +90,7 @@
 			pshotspeed = cons[1];
 			localStorage.setItem("pshotspeed", pshotspeed);
 		}
-		localStorage.setItem("lvlsPassed", 7);
+		//localStorage.setItem("lvlsPassed", 7);
 	
 	//	
 		var preloadc = localStorage.getItem("preloadc");
