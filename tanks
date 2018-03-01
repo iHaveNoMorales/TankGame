@@ -67,7 +67,8 @@
 			localStorage.setItem("money", 0);
 			
 		}
-			localStorage.setItem("money", 10000);
+		restoreDefaultPlayerStats();
+			//localStorage.setItem("money", 10000);
 		if(localStorage.getItem("pspeed") == undefined){
 			restoreDefaultPlayerStats();
 		}
@@ -116,7 +117,7 @@
 		var yveltarg = 0;
 		var xveltarg = 0;
 		var pacc = 0.15;
-		var textVal = document.getElementById("input").value;
+		
 		
 		var phealth = pmaxhealth;
 		var precoverc = 30;
